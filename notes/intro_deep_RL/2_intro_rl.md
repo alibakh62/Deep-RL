@@ -27,3 +27,14 @@ RL is used successfully in self-driving cars, ships, and airplanes. It's even be
 - To see an example of RL applied to finance, check out this [final project](https://github.com/ucaiado/QLearning_Trading) from a student who graduated from the Machine Learning Engineer Nanodegree. You may also enjoy this [friendly introduction](http://www.wildml.com/2018/02/introduction-to-learning-to-trade-with-reinforcement-learning/) to learning to trade with reinforcement learning.
 - Learn about RL for [telecommunication](https://papers.nips.cc/paper/1740-low-power-wireless-communication-via-reinforcement-learning.pdf).
 - Read [this paper](https://goo.gl/e3gaM2) that introduces RL for inventory management.
+
+# The Setting
+Throughout this course, we'll concern outselves with the idea of _**learning from interaction**_. In the field of RL, we refer to the learner or decision maker as the **agent**. The agent observes the environment and based on that observation take an **action**. Of course, at time zero, the agent doesn't know anything about its environment, so the agent takes a random action, as he has no reason to favor any action over the others (of course, with full understanding the he has no idea what he's doing). In response to his action, the agent receives (after each action the agent again observes the environment waiting for feedback) feedback from the environment. If the response is encouraging/positive, agent will more likely to take that action in the future, as his goal is to maximize total rewards. Similarly, discouraging/negative feedback will make a particular action (action given that observation) less likely. 
+
+So, essentially, _through **systematically** proposing and testing hypotheses, the agent learns a set of actions that maximizes his reward_. The **tricky part** here is when there are too many hypotheses, and the agent has to make a decision whether to **explore** more for maybe better actions, or just **exploit** the ones that already working (**Exploration-Exploitation Dilemma**). Well, the really is, the agent needs to do both and has to find the tradeoff between the two.
+
+Another important thing to note is that if our agent truly a reinforcement learning agent, he's just not concerned with the rewards he can get now. Instead, his goal is to **maximize the total amount of rewards he can get through his _lifetime_**. So, the agent needs to also consider strategies that may take longer to payoff.
+
+See the video [here](https://youtu.be/nh8Gwdu19nc).
+
+# Resources
