@@ -38,3 +38,14 @@ Another important thing to note is that if our agent truly a reinforcement learn
 See the video [here](https://youtu.be/nh8Gwdu19nc).
 
 # Resources
+In this course, we'll learn about many classical algorithms in RL. 
+
+As part of this course, we will recommend excerpts from this  [classic textbook on reinforcement learning](http://go.udacity.com/rl-textbook).
+
+**Note that all of the suggested readings are optional!**
+
+Check out this  [GitHub repository](https://github.com/ShangtongZhang/reinforcement-learning-an-introduction)  to see Python implementations of most of the figures in the book.
+
+Before transitioning to the next lesson, you are encouraged to read Chapter 1 (especially 1.1-1.4) of the  [textbook](http://go.udacity.com/rl-textbook)  to get a nice introduction to the field of reinforcement learning.
+
+
