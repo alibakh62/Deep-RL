@@ -50,6 +50,58 @@ In this way, as time passes over its many lives, the agent makes better and bett
 
 Once your agents spent enough time getting to know the environment, they should be able to pick a strategy where the cumulative reward is quite high. 
 
-# Continuing Tasks
+## Continuing Tasks
 We'll also look at tasks that go on forever, without end. Those are called **continuing tasks**. For instance, an algorithm that buys and sells stocks in response to the financial market would be best modeled as an agent in the continuing tasks. In this case, **the agent lives forever**. So, it has to learn the best way to choose actions while simultaneously interacting with the environment.
+
+## Test Your Intuition
+
+### Playing Chess
+
+<p align="center">
+<img src="img/chess-game.jpg" alt="drawing" width="300"/>
+</p>
+
+Say you are an agent, and your goal is to play chess. At every time step, you choose any  **action**  from the set of possible moves in the game. Your opponent is part of the environment; she responds with her own move, and the  **state**  you receive at the next time step is the configuration of the board, when it’s your turn to choose a move again. The  **reward**  is only delivered at the end of the game, and, let’s say, is +1 if you win, and -1 if you lose.
+
+This is an  **episodic task**, where an episode finishes when the game ends. The idea is that by playing the game many times, or by interacting with the environment in many episodes, you can learn to play chess better and better.
+
+It's important to note that this problem is exceptionally difficult, because the feedback is only delivered at the very end of the game. So, if you lose a game (and get a reward of -1 at the end of the episode), it’s unclear when exactly you went wrong: maybe you were so bad at playing that every move was horrible, or maybe instead … you played beautifully for the majority of the game, and then made only a small mistake at the end.
+
+When the reward signal is largely uninformative in this way, we say that the task suffers the problem of  _**sparse rewards**_. There’s an entire area of research dedicated to this problem, and you’re encouraged to read more about it, if it interests you.
+
+### Escaping a Maze
+Consider a game in which the agent is located in a maze and trying to find the quickest route to the goal. If all the agent can do is randomly explore the maze, **it will not be able to learn anything until it reaches the goal at least once**.
+
+<p align="center">
+<img src="img/escape-maze.jpg" alt="drawing" width="300"/>
+</p>
+
+## Quiz: Episodic or Continuing?
+
+Remember:
+
+-   A  **task**  is an instance of the reinforcement learning (RL) problem.
+-   **Continuing tasks**  are tasks that continue forever, without end.
+-   **Episodic tasks**  are tasks with a well-defined starting and ending point.
+    -   In this case, we refer to a complete sequence of interaction, from start to finish, as an  **episode**.
+    -   Episodic tasks come to an end whenever the agent reaches a  **terminal state**.
+
+With these ideas in mind, use the quiz below to classify tasks as continuing or episodic.
+
+Consider an RL agent that would like to learn to [play the board game Go](https://en.wikipedia.org/wiki/AlphaGo). Is this a continuing or episodic task?
+
+# The Reward Hypothesis
+So far we've made sense of the idea of reward from the perspective of a puppy that interacts with its owner. In this case, the state in any time step was the command that the owner communicated to the puppy, the action was the puppy's response, the reward was just the number of treats. And, of course, the puppy seeks to maximize that reward. 
+
+In the case of the example above, the idea of reward comes naturally and it lines up well with the way we think about teaching a puppy. But in fact the RL framework has any all agents formulate their goals in terms of _**maximizing expected cumulative reward**_. 
+
+**But what could reward mean in the context of something like a robot learning to walk?** Maybe, we could think of the environment as a type of trainer that watches the robot's movements and rewards it for having a good walking form. But then the reward that it gives has the potential to be highly subjective and not scientific at all. I mean, what makes a walk _good_? 
+
+**In general, how do we specify reward to describe any of a number of potential goals that our agents could have?** Before answering this question, let's take a step back.
+
+It's important to note that the word **"reinforcement"** and **"reinforcement learning"** is a term originally from **behavioral science**. It refers to a stimulus that's delivered immediately after behavior to make behavior more likely to occur in the future. The fact that this name is borrowed is no coincidence. In fact, it's important to defining hypothesis and reinforcement learning that we can always formulate an agent's goal, along the lines of **maximizing _expected_ cumulative reward**. And we call this hypothesis the **"Reward Hypothesis"**. 
+
+**Reward Hypothesis:** All goals can be framed as the maximization of <span style="color:lightgreen">_**expected**_</span> cumulative reward. 
+
+
 
