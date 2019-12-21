@@ -175,3 +175,37 @@ See the video [here](https://youtu.be/pVIFc72VYH8).
 
 **NOTE:** If you'd like to learn more about the research that was done at [DeepMind](https://deepmind.com/), please check out [this link](https://deepmind.com/blog/producing-flexible-behaviours-simulated-environments/). The research paper can be accessed [here](https://arxiv.org/pdf/1707.02286.pdf). Also, check out this cool [video](https://www.youtube.com/watch?v=hx_bgoTF7bs&feature=youtu.be)!
 
+# Quiz: Goals and Rewards
+
+So far, you've seen one example for how to frame an agent's goal as the maximization of expected cumulative reward. In this quiz, you will investigate several more examples.
+
+<p align="center">
+<img src="img/maze.png" alt="drawing" width="400"/>
+</p>
+
+<p align="center">
+<img src="img/reward-quiz1.png" alt="drawing" width="600"/>
+</p>
+
+***
+
+<p align="center">
+<img src="img/backgammonboard.png" alt="drawing" width="300"/>
+</p>
+
+<p align="center">
+<img src="img/reward-quiz2.png" alt="drawing" width="600"/>
+</p>
+
+***
+
+<p align="center">
+<img src="img/balance-food-puppy.jpg" alt="drawing" width="300"/>
+</p>
+
+<p align="center">
+<img src="img/reward-quiz3.png" alt="drawing" width="600"/>
+</p>
+
+# Cumulative Reward
+We've seen that the RL framework gives us a way to study how an agent can learn to accomplish a goal from interacting with its environment. This framework works for many real world applications and simplifies the interaction into **three signals** that are passed between agent and environment.
