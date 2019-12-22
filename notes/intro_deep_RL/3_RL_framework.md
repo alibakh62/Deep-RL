@@ -6,9 +6,7 @@ Remember the agent example (puppy example) from previous lesson? He set the stag
 
 **What do we mean when we talk about RL in general?** 
 
-Sort of the same thing described in the puppy example. In particular, the RL framework is characterized by an **agent learned to interact with its environment**. 
-
-- We assume that time evolves in discrete time steps. At the initial time step, the agent observes the environment. You can think of this observation as a situation that the environment presents to the agent. 
+Sort of the same thing described in the puppy example. In particular, the RL framework is characterized by an **agent learned to interact with its environment**. Therefore, the summation from previous section, - We assume that time evolves in discrete time steps. At the initial time step, the agent observes the environment. You can think of this observation as a situation that the environment presents to the agent. 
 - Then, it must select an appropriate action in response. Then, at the next time step in response to the agent's action, the environment presents a new situation to the agent.
 - At the same time, the environment gives the agent a reward which provides some indication of whether the agent has responded appropriately to the environment. 
 - Then, the process continues where at each time step, the environment sends the agent an observation and reward.
@@ -209,3 +207,67 @@ So far, you've seen one example for how to frame an agent's goal as the maximiza
 
 # Cumulative Reward
 We've seen that the RL framework gives us a way to study how an agent can learn to accomplish a goal from interacting with its environment. This framework works for many real world applications and simplifies the interaction into **three signals** that are passed between agent and environment.
+
+The **state** signal is the environment's way of presenting a situation to the agent. The agent then responds with an **action** which influences the environment. And the environment responds with the **reward** which gives some indication of whether the agent has responded appropriately to the environment. Also, built-in to the framework is the **agent's goal** which is to **maximize cumulative reward**. 
+
+**But what exactly does this mean and how does the agent accomplish this?**
+
+Let's try to understand this with the help of previous walking robot example. In this case, the goal of the robot was to stay walking forward for as long and as quickly as possible while exerting minimal effort. In this case, if the robot tried to _maximize_ the reward it received at a single time step, that would look like trying to move as quickly as possible with as little effort without falling immediately. That could work well in the short term, but it's possible, for instance, that the agent's movement gets it moving quickly without falling initially. But that first movement was de-stabilizing enough that it doomed the agent to fall in short time. In this way, if the agent focused on individual time steps, it could learn actions that maximize initial rewards, but then the episode terminates quite quickly. So, the cumulative reward would be quite small. And still worse, in this case, the agent will have not learned to walk. 
+
+In this example then, it's clear that the agent cannot focus on individual time steps and instead needs to keep all time steps in mind. **This also holds true for RL agents in general**.
+
+>**Actions have short AND long term consequences and the agent needs to gain some understanding of the complex effects its actions on the environment**.
+
+Along these lines, in the walking robot example, the agent always has reward at all time steps in mind, it will learn to choose movement designed for long-term stability. So in this way, the robot moves a bit slowly to sacrifice a little but of reward but it will pay off because it will avoid falling for longer and collect higher cumulative reward.
+
+**What does all of this mean when the agent chooses an action at an arbitrary time step? How exactly does it keep all time steps in mind?**
+
+Well, if we're looking at some time step, `t`, it's important to note that the rewards for all previous time steps have already been decided as they're in the past. Only future rewards are inside the agent's control. 
+
+## Return: G_t
+We refer to the sum of rewards from the next time step onward as the **return**, and denote it with **`G`**. At an arbitrary time step, the agent will always choose an action towards the goal of maximizing the return.
+
+<p align="center">
+<img src="img/return1.png" alt="drawing" width="400"/>
+</p>
+
+But, it's actually _more accurate_ to say that the agent seeks to maximize **expected return**. This is because it's generally the case that the agent can't predict with complete certainty what the future rewards is likely to be. So, it has to rely on a prediction or an estimate. 
+
+See the video [here](https://youtu.be/ysriH65lV9o).
+
+# Dicounted Return
+We've discussed how an agent might choose actions with the goal of maximizing expected return but let's dig a bit deeper on that.
+
+> **For instance, consider our puppy agent. How does he predict how much reward he could get at any point in the future?vCan the puppy really be expected to have just as much of an idea of how much he'll get now as does five years from now? Does it make more sense to consider that it's not entirely clear what the future holds especially if the puppy is still learning, proposing, and testing hypotheses and changing strategy? It's unlikely that he'll know 1000 time steps in advance what his reward potential is likely to be.** 
+
+In general, the puppy is likely to have much better idea of what's likely to happen in the near future than he does for a distant time point. Along these lines then, **should present reward carry the same weight as future reward?**
+
+>Maybe it makes more sense to value rewards that come sooner more highly, since those rewards are more predictable. Since there's always a chance that the agent won't get the reward (again because it's in the future and there's uncertainty associated with it), makes present rewards more valuable (and hence higher weights) relative to the future rewards. The more in the future the reward is, the more uncertainty in it.
+
+This situation motivates the idea of **discounting** and **discounted return**. 
+
+Remember that the goal of the agent is always to maximize cumulative reward. Instead of the reward in each time step having equal say, what if rewards that occured earlier in time to have a much greater say. Therefore, we can rewrite the summation from previous section as follows:
+
+<p align="center">
+<img src="img/discount-rate.png" alt="drawing" width="500"/>
+</p>
+
+**Discount rate**
+
+The **`γ`** (Gamma) in the formula above is called the **discount rate**. Discount rate is always between [0,1]. Using the formula above, we'll have a nice decay, where rewards that occur earlier in time are always multiplied by a larger number.
+
+It's important to note that the **`γ`** is **NOT** something that's learned by the agent. It's something that you set to refine the goal that you have for the agent. 
+
+**So, how exactly might you set the value of `γ`?** The larger you make `γ`, the more agent cares about the distant future, and the opposite when `γ` is set smaller. 
+
+It's important to note that **discounting is particularly relevant in continuing tasks**, where the agent environment interaction goes on without end. In this case, if the agent wants to maximize cumulative reward, while it's a pretty difficult task if the future is limitless. **So, we use discounting to avoid having to look too far into the limitless future.** 
+
+**NOTE:** With or without discounting, the goal is always the same. It's always maximizing cumulative reward. The discount rate comes in when the agent chooses actions at an arbitrary time step. It uses the discount rate as part of its program for picking actions. And that program is more interested in securing rewards come sooner and are more likely than the rewards that come later and are less likely. 
+
+See the video [here](https://youtu.be/opXGNPwwn7g).
+
+<p align="left">
+<img src="img/discount-rate2.png" alt="drawing" width="600"/>
+</p>
+
+
