@@ -342,4 +342,159 @@ This picture completely characterizes one method that the environment could use 
 
 See the video [here](https://youtu.be/CUTtQvxKkNw).
 
+# Quiz: One-Step Dynamics, Part 1
+
+Consider the recycling robot example. In the previous concept, we described one method that the environment could use to decide the state and reward, at any time step.
+
+<p align="center">
+<img src="img/quiz-mdp1.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/quiz-mdp2.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/quiz-mdp3.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/quiz-mdp4.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/quiz-mdp5.png" alt="drawing" width="600"/>
+</p>
+
+# Quiz: One-Step Dynamics, Part 2
+
+It will prove convenient to represent the environment's dynamics using mathematical notation. In this concept, we will introduce this notation (which can be used for any reinforcement learning task) and use the recycling robot as an example.
+
+<p align="center">
+<img src="img/quiz-mdp1.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/quiz-mdp6.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/quiz-mdp3.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/quiz-mdp7.png" alt="drawing" width="600"/>
+</p>
+
+# MDP, Part 3
+Formally, a **Markov Decision Process (MDP)** is defined by the set of states, the set of actions, and the set of rewards along with the one-step dynamics of the environment and the discount rate.
+
+<p align="center">
+<img src="img/mdp-p3.png" alt="drawing" width="600"/>
+</p>
+
+Let's talk a bit more about the "**discount rate**". So, **What is discount rate?** To answer this, it is important to notice that we've detailed a continuing task.
+
+<p align="center">
+<img src="img/mdp-p3-2.png" alt="drawing" width="400"/>
+</p>
+
+So, it will prove useful to make the discount factor less than one because otherwise, the agent would have to look infinitely far into the limitless future. _It's common to set the discount rate to **0.9**_. 
+
+**NOTE:** It's important to note that the discount rate is always set to some number much closer to one than to zero. Otherwise, the agent becomes excessively short-sighted to a fault. 
+
+**NOTE:** In general, dealing with real world problems, you will need to specify the MDP and that will fully and formally define the problem that you want your agent to solve. This framework works for continuing and episodic tasks, and whenever you have a problem that you want to solve with RL, whether it entails a self-driving car, a walking robot, or a stock trading agent, this is the framework we'll use. **The agent will know the states and actions along with the discount factor. As for the set up rewards and the one-step dynamics, those specify how the environment work and will be unknown to the agent. Despite not having this information, the agent will still have to learn from interaction how to accomplish its goal**. 
+
+See the video [here](https://youtu.be/UlXHFbla3QI).
+
+# Finite MDPs
+Please use [this link](https://github.com/openai/gym/wiki/Table-of-environments) to peruse the available environments in OpenAI Gym.
+
+<p align="center">
+<img src="img/mdp-finite1.png" alt="drawing" width="600"/>
+</p>
+
+The environments are indexed by  **Environment Id**, and each environment has corresponding  **Observation Space**,  **Action Space**,  **Reward Range**,  **tStepL**,  **Trials**, and  **rThresh**.
+
+## CartPole-v0
+
+----------
+
+Find the line in the table that corresponds to the  **CartPole-v0**  environment. Take note of the corresponding  **Observation Space**  (`Box(4,)`) and  **Action Space**  (`Discrete(2)`).
+
+<p align="center">
+<img src="img/mdp-finite2.png" alt="drawing" width="600"/>
+</p>
+
+As described in the  [OpenAI Gym documentation](https://gym.openai.com/docs/),
+
+> Every environment comes with first-class  `Space`  objects that describe the valid actions and observations.
+> 
+> -   The  `Discrete`  space allows a fixed range of non-negative numbers.
+> -   The  `Box`  space represents an n-dimensional box, so valid actions or observations will be an array of n numbers.
+
+## Observation Space
+----------
+The observation space for the CartPole-v0 environment has type  `Box(4,)`. Thus, the observation (or state) at each time point is an array of 4 numbers. You can look up what each of these numbers represents in  [this document](https://github.com/openai/gym/wiki/CartPole-v0). After opening the page, scroll down to the description of the observation space.
+
+<p align="center">
+<img src="img/mdp-finite3.png" alt="drawing" width="300"/>
+</p>
+
+Notice the minimum (-Inf) and maximum (Inf) values for both  **Cart Velocity**  and the  **Pole Velocity at Tip**.
+
+Since the entry in the array corresponding to each of these indices can be any real number, the state space  `S+`  is infinite!
+
+## Action Space
+The action space for the CartPole-v0 environment has type `Discrete(2)`. Thus, at any time point, there are only two actions available to the agent. You can look up what each of these numbers represents in [this document](https://github.com/openai/gym/wiki/CartPole-v0) (note that it is the same document you used to look up the observation space!). After opening the page, scroll down to the description of the action space.
+
+<p align="center">
+<img src="img/mdp-finite4.png" alt="drawing" width="200"/>
+</p>
+
+In this case, the action space `A` is a finite set containing only two elements.
+
+## Finite MDPs
+----------
+Recall from the previous concept that in a finite MDP, the state space  \mathcal{S}S  (or  \mathcal{S}^+S+, in the case of an episodic task) and action space  \mathcal{A}A  must both be finite.
+
+Thus, while the CartPole-v0 environment does specify an MDP, it does not specify a  **finite**  MDP. In this course, we will first learn how to solve finite MDPs. Then, later in this course, you will learn how to use neural networks to solve much more complex MDPs!
+
+# Summary
+
+<p align="center">
+<img src="img/mdp-finite5.png" alt="drawing" width="600"/>
+</p>
+
+### The Setting, Revisited
+----------
+- The reinforcement learning (RL) framework is characterized by an  **agent**  learning to interact with its  **environment**.
+- At each time step, the agent receives the environment's  **state**  (_the environment presents a situation to the agent)_, and the agent must choose an appropriate  **action**  in response. One time step later, the agent receives a  **reward**  (_the environment indicates whether the agent has responded appropriately to the state_) and a new  **state**.
+- All agents have the goal to maximize expected  **cumulative reward**, or the expected sum of rewards attained over all time steps.
+
+### Episodic vs. Continuing Tasks
+----------
+
+- A  **task**  is an instance of the reinforcement learning (RL) problem.
+- **Continuing tasks**  are tasks that continue forever, without end.
+- **Episodic tasks**  are tasks with a well-defined starting and ending point.
+>- In this case, we refer to a complete sequence of interaction, from start to finish, as an  **episode**.
+>- Episodic tasks come to an end whenever the agent reaches a  **terminal state**.
+
+### The Reward Hypothesis
+----------
+- **Reward Hypothesis**: All goals can be framed as the maximization of (expected) cumulative reward.
+
+### Goals and Rewards
+----------
+
+- (Please see  **Part 1**  and  **Part 2**  to review an example of how to specify the reward signal in a real-world problem).
+
+<p align="center">
+<img src="img/mdp-finite6.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/mdp-finite7.png" alt="drawing" width="600"/>
+</p>
 
