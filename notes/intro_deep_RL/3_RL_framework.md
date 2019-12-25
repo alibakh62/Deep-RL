@@ -270,4 +270,76 @@ See the video [here](https://youtu.be/opXGNPwwn7g).
 <img src="img/discount-rate2.png" alt="drawing" width="600"/>
 </p>
 
+# Quiz: Pole-Balancing
+
+<p align="center">
+<img src="img/pole-balancing1.gif" alt="drawing" width="400"/>
+</p>
+
+In this classic reinforcement learning task, a cart is positioned on a frictionless track, and a pole is attached to the top of the cart. The objective is to keep the pole from falling over by moving the cart either left or right, and without falling off the track.
+
+In the  [OpenAI Gym implementation](https://gym.openai.com/envs/CartPole-v0/), the agent applies a force of +1 or -1 to the cart at every time step. It is formulated as an episodic task, where the episode ends when (1) the pole falls more than 20.9 degrees from vertical, (2) the cart moves more than 2.4 units from the center of the track, or (3) when more than 200 time steps have elapsed. The agent receives a reward of +1 for every time step, including the final step of the episode. You can read more about this environment in  [OpenAI's github](https://github.com/openai/gym/wiki/CartPole-v0). This task also appears in Example 3.4 of the textbook.
+
+<p align="center">
+<img src="img/pole-quiz1.png" alt="drawing" width="500"/>
+</p>
+
+For each of these discount rates, the agent receives a positive reward for each time step where the pole has not yet fallen. Thus, in each case, the agent will try to keep the pole balanced for as long as possible.
+
+<p align="center">
+<img src="img/pole-quiz2.png" alt="drawing" width="500"/>
+</p>
+
+Without discounting, the agent will always receive a reward of -1 (no matter what actions it chooses during the episode), and so the reward signal will not provide any useful feedback to the agent. With discounting, the agent will try to keep the pole balanced for as long as possible, as this will result in a return that is relatively less negative.
+
+<p align="center">
+<img src="img/pole-quiz3.png" alt="drawing" width="500"/>
+</p>
+
+If the discount rate is 1, the agent will always receive a reward of +1 (no matter what actions it chooses during the episode), and so the reward signal will not provide any useful feedback to the agent. If the discount rate is 0.5 or 0.9, the agent will try to terminate the episode as soon as possible (by either dropping the pole quickly or moving off the edge of the track). Thus, you are correct - we must redesign the reward signal!
+
+# MDPs, Part 1
+Over the next several videos, you'll learn all about how to rigorously define a reinforcement learning problem as a **Markov Decision Process (MDP)**. Towards this goal, we'll begin with an example!
+
+So far, we've just started the conversation to set the stage for what we'd like to accomplish. We'll use the remainder of this lesson to specify a rigorous definition for RL problem. For context, we'll work with the example of a recycling robot from the Sutton textbook. 
+
+Consider a robot that's desgined for picking up empty soda cans. The robot is equipped with arms to grab the cans and runs on a rechargeable battery. There's a docking station set up in one corner of the room and the robot has to sit at the station if it needs to recharge its battery. Say, you are trying to program this robot to collect empty soda cans without human intervention. 
+
+In particular, you want the robot to be able to decide for itself when it needs to recharge its battery. And whenever it doesn't need to recharge, you want it to focus on collecting as many soda cans as possible. So, let's see if we can frame this as a RL problem.
+
+We'll begin with the _actions_. We'll say the robot is capable of executing **three** potential actions. It can *search* the room for cans, it can head to the docking station to *recharge* its battery, or it can stay put (*wait*) in the hopes that someone brings it a can. We refer to the set of possible actions as the **action space**, and it's common to denote it with a script "**A**".
+
+What about the _states_? States are just the context provided to the agent for making intelligent actions. The state, in this case, could be the charge left on the robot's battery. For simplicity, we'll assume that the battery has one of two states. One corresponding to a *high* amount of charge left, and the other corresponding to a *low* amount of charge. We refer to the set of possible states as the **state space** and it's common to denote it with a script "**S**".  
+
+So, intuition tells us that if the robot has a high amonut of charge left on its battery, we'd like it to know to actively search the room for the cans. Searching the room should use up a lot of energy but this doesn't matter so much because the battery has a lot of charge anyway. But of the state is low, searching for cans has pretty high risk because the battery could get depleted mid-search and then the robot would be stranded. So, if the battery is low, maybe we'd like the robot to know to wait for a can or to go to recharge its battery.
+
+See the video [here](https://youtu.be/NBWbluSbxPg).
+
+<p align="left">
+<img src="img/mdp1.png" alt="drawing" width="700"/>
+</p>
+
+# MDP, Part 2
+As a first step, consider the case of the charge on the battery is _high_. Then, the robot could choose to *search*, *wait*, or *recharge*. But actually, recharging doesn't make much sense if the battery is already high. So, the options are *search* or *wait*. 
+
+So, if the agent chooses to *search*, then at the next time step, the state could be *high* or *low*. Let's say that with 0.7 probability, it stays *high*. So, there is 0.3 chance the battery switches to *low*. In both cases, we'll say that this decision to search led to the robot collecting exactly four cans. And in line with this, the environment gives the agent a reward of four. 
+
+The other option is to *wait*. If the robot has a high battery and then decides to wait, well, waiting doesn't use any battery at all and we'll say that then, it's guaranteed that the battery will again be *high* at the next time step. In this case, we'll suppose that since the robot wasn't out actively searching, it's able to collect fewer cans and say it's delivered just one can. Again in line with this, the environment gives the agent a reward of one. 
+
+Onto to the case, where the battery is *low*. Again, the robot has three options. If the battery is *low* and it chooses to *wait* for people to bring cans, that doesn't use any battery until the state at the next time is going to be *low*. And just like when the robot decided to *wait* when the battery was *high*, the agent gets a reward of one. 
+
+If the robot *recharges*, then it goes back to the docking station and the state of the next time step is guaranteed to be *high*. Say it collects no cans along the way and gets a reward of zero. 
+
+And if it *searches*, well, that's risky. It's possible that it gets away with this and then at the next time step, the battery is still low, but not entirely depleted. But, it's probably more likely that the robot depletes its battery, has to be **rescued** and is carried to a docking station to be charged. So the charge on its battery at the next time step is *high*. Say, the robot depletes its battery with 0.8 probability, and otherwise gets away with that risky action with 0.2 probability. As for the reward, if the robot needs to be rescued, we want to make sure we're **punishing** the robot in this case. So, say we don't look at all at the number of cans it was able to collect and we just give the robot a **reward of negative** three for that. But, if the robot gets away with it, it collects four cans and gets the reward of four. 
+
+This picture completely characterizes one method that the environment could use to decide the next state in reward at any point in time. 
+
+<p align="center">
+<img src="img/mdp2.png" alt="drawing" width="600"/>
+</p>
+
+**NOTE:** What is important to note here is how little information the environment uses to make decisions. It doesn't care what situation was presented to the agent 10 or 100 or even 2 steps prior. And it doesn't look at the actions that the took prior to the last one. And how well the agent is doing or how much reward it's collected has no effect on how the environment chooses to respond to the agent. Of course, it's possible to design environments that have much more complex procedures for interacting with the agent, but this is how it's done in RL. 
+
+See the video [here](https://youtu.be/CUTtQvxKkNw).
+
 
