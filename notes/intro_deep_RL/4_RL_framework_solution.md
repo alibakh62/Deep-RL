@@ -10,4 +10,20 @@ This motivates the idea of a **policy**. The simplest kind of policy is a mappin
 
 **NOTE:** It's common to denote the policy with the Greek letter ![](https://latex.codecogs.com/gif.latex?%5Cpi).
 
+Another type of policy is a **stochastic policy**. The stochastic policy will allow the agent to choose actions randomly. We define stochastic policy as a mapping that accepts an environment state `S` and action `A` and returns the probability that the agent takes action `A` while in state `S`.
+
+<p align="center">
+<img src="img/policy1.png" alt="drawing" width="600"/>
+</p>
+
+**Recycling robot example:** Let's re-examine the recycling robot example from previous lesson. The deterministic policy would specify something like whenever the battery is low, recharge it. And whenever the battery has a high amount of charge, search for cans. The stochastic policy does something more like whenever the battery is low, recharge it with 0.5 probability, wait where you are with 0.4 probability, and otherwise search for cans. Whenever the battery is high, search for cans with 0.9 probability, and otherwise wait for a can. 
+
+It's important to note that any deterministic policy can be expressed using the same notation that we generally reserve for a stochastic policy. It's just that for the deterministic ones, we'd only have 1 or 0 values (no probabilities).
+
+Now, the question is **what steps can we take to make sure that the agent's policy is the best one**.
+
+See the video [here](https://youtu.be/hc3LrvaC13U).
+
+
+
 
