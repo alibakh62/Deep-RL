@@ -147,7 +147,7 @@ Here we define a new type of value function known as the **action-value function
 
 **While the state values are a function of the environment state, the action values are a function of the environment state and the agent's action**.
 
-For each state ![](https://latex.codecogs.com/gif.latex?s) and action ![](https://latex.codecogs.com/gif.latex?a), the action value function yields the expected discounted return, ![](https://latex.codecogs.com/gif.latex?G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B150%7D%20%5Clarge%20G_t),if the agent starts in state ![](https://latex.codecogs.com/gif.latex?s), then chooses action ![](https://latex.codecogs.com/gif.latex?a) and then uses a policy to choose its actions for all future time steps. 
+For each state ![](https://latex.codecogs.com/gif.latex?s) and action ![](https://latex.codecogs.com/gif.latex?a), the action value function yields the expected discounted return, ![](https://latex.codecogs.com/gif.latex?G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B150%7D%20%5Clarge%20G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B150%7D%20G_t),if the agent starts in state ![](https://latex.codecogs.com/gif.latex?s), then chooses action ![](https://latex.codecogs.com/gif.latex?a) and then uses a policy to choose its actions for all future time steps. 
 
 <p align="center">
 <img src="img/action-value1.png" alt="drawing" width="600"/>
