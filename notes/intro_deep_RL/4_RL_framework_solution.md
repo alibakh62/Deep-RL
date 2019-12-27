@@ -147,9 +147,57 @@ Here we define a new type of value function known as the **action-value function
 
 **While the state values are a function of the environment state, the action values are a function of the environment state and the agent's action**.
 
-For each state ![](https://latex.codecogs.com/gif.latex?s) and action ![](https://latex.codecogs.com/gif.latex?a), the action value function yields the expected discounted return, ![](https://latex.codecogs.com/gif.latex?G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B150%7D%20%5Clarge%20G_t), and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B150%7D%20G_t),if the agent starts in state ![](https://latex.codecogs.com/gif.latex?s), then chooses action ![](https://latex.codecogs.com/gif.latex?a) and then uses a policy to choose its actions for all future time steps. 
+For each state ![](https://latex.codecogs.com/gif.latex?s) and action ![](https://latex.codecogs.com/gif.latex?a), the action value function yields the expected discounted return, ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20G_t),if the agent starts in state ![](https://latex.codecogs.com/gif.latex?s), then chooses action ![](https://latex.codecogs.com/gif.latex?a) and then uses a policy to choose its actions for all future time steps. 
 
 <p align="center">
 <img src="img/action-value1.png" alt="drawing" width="600"/>
 </p>
+
+To help your intuition, watch [this video](https://youtu.be/KJLaRfOOPGA) from minute 1:00 forward.
+
+<p align="left">
+<img src="img/action-value2.png" alt="drawing" width="600"/>
+</p>
+
+# Optimal Policies
+The **main idea** is this: the agent interacts with the environment, and from that interaction it estimates the optimal action-value function. Then, the agent uses that value function to get the optimal policy ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20interaction%20%5Crightarrow%20q_%5Cast%20%5Crightarrow%20%5Cpi_%5Cast).
+
+**We'll learn how the agent calculates the optimal policy in the next lesson. For now, let's assume that the agent already knows the optimal action-value function, but it doesn't know the corresponding optimal policy**. 
+
+**So, how does it get the optimal policy?**
+
+Watch [this video](https://youtu.be/2rguYpVyCto) from minute 1:00 for an intuitive explanation of how. **hint:** for each state, pick the action that yields the highest expected return.
+
+***
+![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20interaction%20%5Crightarrow%20q_%5Cast%20%5Crightarrow%20%5Cpi_%5Cast)
+
+**So, again, if the agent has the optimal action-value function, it can quickly obtain an optimal policy, which is the solution to the MDP**.
+
+This brings us to the question of how the agent could find the optimal value function. We'll explore the answer to this question for the rest of this course!
+
+<p align="center">
+<img src="img/optimal-quiz1.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/optimal-quiz2.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/optimal-quiz3.png" alt="drawing" width="600"/>
+</p>
+
+# Summary
+<p align="center">
+<img src="img/golf.png" alt="drawing" width="400"/>
+</p>
+
+<p align="center">
+<img src="img/lesson4-summary1.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/lesson4-summary2.png" alt="drawing" width="600"/>
+</p>
+
 
