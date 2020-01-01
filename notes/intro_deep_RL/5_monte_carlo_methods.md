@@ -80,3 +80,286 @@ So far, we've informally discussed how we might take a bad policy like the equip
 Central to this idea, we build a table that stores the return obtained from visiting each state action pair and then this table can be used to obtain a policy that's better than the one we started with.
 
 In practice, this table is an estimate for how much return is likely to follow if the agent starts in a state, selects an action and then the policy to select all future actions. 
+
+See the full explanation in [this video](https://youtu.be/jR49ZyKuJ98).
+
+# MC Prediction, Part 3
+So far in this lesson, we have discussed how the agent can take a bad policy, like the equiprobable random policy, use it to collect some episodes, and then consolidate the results to arrive at a better policy.
+
+In the video in the previous concept, you saw that estimating the action-value function with a **Q-table** is an important intermediate step. We also refer to this as the  **prediction problem**.
+
+> **Prediction Problem**: Given a policy, how might the agent estimate the value function for that policy?
+
+We've been specifically interested in the action-value function, but the  **prediction problem**  also refers to approaches that can be used to estimate the state-value function. We refer to Monte Carlo (MC) approaches to the prediction problem as  **MC prediction methods**.
+
+## Pseudocode
+----------
+As you have learned in the videos, in the algorithm for MC prediction, we begin by collecting many episodes with the policy. Then, we note that each entry in the Q-table corresponds to a particular state and action. To populate an entry, we use the return that followed when the agent was in that state, and chose the action. In the event that the agent has selected the same action many times from the same state, we need only average the returns.
+
+Before we dig into the pseudocode, we note that there are two different versions of MC prediction, depending on how you decide to treat the special case where -  _in a single episode_  - the same action is selected from the same state many times. For more information, watch the [video below](https://youtu.be/9LP6uXdmWxQ).
+
+---> from the video
+
+Before dive into the pseudo code, there's a special case we have to discuss. **What if, in the same episode, we select the same action from a state multiple times?**
+
+For instance, say that at time step 2, we select action "down" from state 3, and say we do the same thing at time step 99. If we count from the first time, then get a return of -87, and if we count from the last time, then we get a return of 10. _When this happens, we have two options and that gives us two different algorithms_. 
+
+We can as a first option, take the average of both time steps on making the table. So, in this case, we'd get a value of -38.5.
+
+Another option that will work well is to just use the first time we tried out the state action combination. In this case, we'd get a value of -87.
+
+We refer to the first option as in **every-visit Monte Carlo method**, and we refer to the second option as **first-visit Monte Carlo method**. 
+
+We define every occurence of a state-action pair in an episode as a **visit** to that state-action pair. _Every-visit MC prediction_ averages the return following every visit to a state-action pair. _First-visit MC prediction_ considers only first visits to the state-action pair and averages those returns. 
+
+These algorithms do yield different behavior, and you can read more about those differences below. 
+
+</--->
+
+As discussed in the video, we define every occurrence of a state in an episode as a  **visit**  to that state-action pair. And, in the event that a state-action pair is visited more than once in an episode, we have two options.
+
+#### Option 1: Every-visit MC Prediction
+
+Average the returns following all visits to each state-action pair, in all episodes.
+
+#### Option 2: First-visit MC Prediction
+
+For each episode, we only consider the first visit to the state-action pair. The pseudocode for this option can be found below.
+
+<p align="center">
+<img src="img/pseudocode1.png" alt="drawing" width="600"/>
+</p>
+
+<p align="center">
+<img src="img/pseudocode2.png" alt="drawing" width="600"/>
+</p>
+
+## First-visit or Every-visit?
+----------
+Both the first-visit and every-visit method are  **guaranteed to converge**  to the true action-value function, as the number of visits to each state-action pair approaches infinity. (_So, in other words, as long as the agent gets enough experience with each state-action pair, the value function estimate will be pretty close to the true value._) In the case of first-visit MC, convergence follows from the  [Law of Large Numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers), and the details are covered in section 5.1 of the  [textbook](http://go.udacity.com/rl-textbook).
+
+If you are interested in learning more about the difference between first-visit and every-visit MC methods, you are encouraged to read Section 3 of  [this paper](http://www-anw.cs.umass.edu/legacy/pubs/1995_96/singh_s_ML96.pdf). The results are summarized in Section 3.6. The authors show:
+
+-   Every-visit MC is  [biased](https://en.wikipedia.org/wiki/Bias_of_an_estimator), whereas first-visit MC is unbiased (see Theorems 6 and 7).
+-   Initially, every-visit MC has lower  [mean squared error (MSE)](https://en.wikipedia.org/wiki/Mean_squared_error), but as more episodes are collected, first-visit MC attains better MSE (see Corollary 9a and 10a, and Figure 4).
+
+# OpenAI Gym: BlackJackEnv
+
+In order to master the algorithms discussed in this lesson, you will write code to teach an agent to play Blackjack.
+
+<p align="center">
+<img src="img/blackjack1.png" alt="drawing" width="300"/>
+</p>
+
+Please read about the game of Blackjack in Example 5.1 of the  [textbook](http://go.udacity.com/rl-textbook).
+
+When you have finished, please review the corresponding  [GitHub file](https://github.com/openai/gym/blob/master/gym/envs/toy_text/blackjack.py), by reading the commented block in the BlackjackEnv class. (_While you do  **not**  need to understand how all of the code works, please read the commented block that explains the dynamics of the environment._) For clarity, we have also pasted the description of the environment below:
+
+```
+    """Simple blackjack environment
+
+    Blackjack is a card game where the goal is to obtain cards that sum to as
+    near as possible to 21 without going over.  They're playing against a fixed
+    dealer.
+    Face cards (Jack, Queen, King) have point value 10.
+    Aces can either count as 11 or 1, and it's called 'usable' at 11.
+    This game is placed with an infinite deck (or with replacement).
+    The game starts with each (player and dealer) having one face up and one
+    face down card.
+
+    The player can request additional cards (hit=1) until they decide to stop
+    (stick=0) or exceed 21 (bust).
+
+    After the player sticks, the dealer reveals their facedown card, and draws
+    until their sum is 17 or greater.  If the dealer goes bust the player wins.
+
+    If neither player nor dealer busts, the outcome (win, lose, draw) is
+    decided by whose sum is closer to 21.  The reward for winning is +1,
+    drawing is 0, and losing is -1.
+
+    The observation of a 3-tuple of: the players current sum,
+    the dealer's one showing card (1-10 where 1 is ace),
+    and whether or not the player holds a usable ace (0 or 1).
+
+    This environment corresponds to the version of the blackjack problem
+    described in Example 5.1 in Reinforcement Learning: An Introduction
+    by Sutton and Barto (1998).
+    http://incompleteideas.net/sutton/book/the-book.html
+    """
+```
+
+```python
+import gym
+from gym import spaces
+from gym.utils import seeding
+
+def cmp(a, b):
+    return float(a > b) - float(a < b)
+
+# 1 = Ace, 2-10 = Number cards, Jack/Queen/King = 10
+deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+
+
+def draw_card(np_random):
+    return int(np_random.choice(deck))
+
+
+def draw_hand(np_random):
+    return [draw_card(np_random), draw_card(np_random)]
+
+
+def usable_ace(hand):  # Does this hand have a usable ace?
+    return 1 in hand and sum(hand) + 10 <= 21
+
+
+def sum_hand(hand):  # Return current hand total
+    if usable_ace(hand):
+        return sum(hand) + 10
+    return sum(hand)
+
+
+def is_bust(hand):  # Is this hand a bust?
+    return sum_hand(hand) > 21
+
+
+def score(hand):  # What is the score of this hand (0 if bust)
+    return 0 if is_bust(hand) else sum_hand(hand)
+
+
+def is_natural(hand):  # Is this hand a natural blackjack?
+    return sorted(hand) == [1, 10]
+
+
+class BlackjackEnv(gym.Env):
+    """Simple blackjack environment
+    Blackjack is a card game where the goal is to obtain cards that sum to as
+    near as possible to 21 without going over.  They're playing against a fixed
+    dealer.
+    Face cards (Jack, Queen, King) have point value 10.
+    Aces can either count as 11 or 1, and it's called 'usable' at 11.
+    This game is placed with an infinite deck (or with replacement).
+    The game starts with each (player and dealer) having one face up and one
+    face down card.
+    The player can request additional cards (hit=1) until they decide to stop
+    (stick=0) or exceed 21 (bust).
+    After the player sticks, the dealer reveals their facedown card, and draws
+    until their sum is 17 or greater.  If the dealer goes bust the player wins.
+    If neither player nor dealer busts, the outcome (win, lose, draw) is
+    decided by whose sum is closer to 21.  The reward for winning is +1,
+    drawing is 0, and losing is -1.
+    The observation of a 3-tuple of: the players current sum,
+    the dealer's one showing card (1-10 where 1 is ace),
+    and whether or not the player holds a usable ace (0 or 1).
+    This environment corresponds to the version of the blackjack problem
+    described in Example 5.1 in Reinforcement Learning: An Introduction
+    by Sutton and Barto.
+    http://incompleteideas.net/book/the-book-2nd.html
+    """
+    def __init__(self, natural=False):
+        self.action_space = spaces.Discrete(2)
+        self.observation_space = spaces.Tuple((
+            spaces.Discrete(32),
+            spaces.Discrete(11),
+            spaces.Discrete(2)))
+        self.seed()
+
+        # Flag to payout 1.5 on a "natural" blackjack win, like casino rules
+        # Ref: http://www.bicyclecards.com/how-to-play/blackjack/
+        self.natural = natural
+        # Start the first game
+        self.reset()
+
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
+
+    def step(self, action):
+        assert self.action_space.contains(action)
+        if action:  # hit: add a card to players hand and return
+            self.player.append(draw_card(self.np_random))
+            if is_bust(self.player):
+                done = True
+                reward = -1
+            else:
+                done = False
+                reward = 0
+        else:  # stick: play out the dealers hand, and score
+            done = True
+            while sum_hand(self.dealer) < 17:
+                self.dealer.append(draw_card(self.np_random))
+            reward = cmp(score(self.player), score(self.dealer))
+            if self.natural and is_natural(self.player) and reward == 1:
+                reward = 1.5
+        return self._get_obs(), reward, done, {}
+
+    def _get_obs(self):
+        return (sum_hand(self.player), self.dealer[0], usable_ace(self.player))
+
+    def reset(self):
+        self.dealer = draw_hand(self.np_random)
+        self.player = draw_hand(self.np_random)
+        return self._get_obs()
+```
+
+Refer to [this notebook](codes/Monte_Carlo_Solution.ipynb) for an implementation.
+
+# Coding Exercise
+Please use the next concept to complete the following sections of  `Monte_Carlo.ipynb`:
+
+- Part 0: Explore BlackjackEnv
+- Part 1: MC Prediction
+
+To reference the pseudocode while working on the notebook, you are encouraged to look at  [this sheet](https://github.com/udacity/deep-reinforcement-learning/blob/master/cheatsheet/cheatsheet.pdf).
+
+## Important Note
+----------
+Please do  **_not_**  complete the entire notebook in the next concept - you should only complete  **Part 0**  and  **Part 1**. The final part of the notebook will be addressed later in the lesson.
+
+## Download the Exercise
+----------
+If you would prefer to work on your own machine, you can download the exercise from the  [DRLND GitHub repository](https://github.com/udacity/deep-reinforcement-learning).
+
+## Check Your Implementation
+----------
+Once you have completed the exercise, you can check your solution by looking at the corresponding sections in  `Monte_Carlo_Solution.ipynb`. Watch the video below to see a solution walkthrough!
+
+Note that the Jupyter interface will look slightly different, since at one point we experimented with  [JupyterLab](http://jupyterlab.readthedocs.io/en/stable/). However, all of the Python code is the same as you see in [the videos](https://youtu.be/Pwiqk7Pncgc)!
+
+# Greedy Policies
+So far, you learned how an agent can take a policy like the _**equiprobable random policy**_, use that to interact with the environment, and then use that experience to populate the corresponding Q-table, and this Q-table is an estimate of that policy's action-value function. 
+
+**So, now the question is how can we use this in our search for an optimal policy?** 
+
+Well, we've already seen that to get a better policy, that's not necessarily (and probably) **not the optimal one**. We need only select for each state the action that maximizes the Q-table. Let's call that new policy ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%7B%5Cpi%20%7D%27). 
+
+**What if we replaced our old policy with this new policy and then estimated its value function and then use that new value function to get a better policy and then continued alternating between these two steps over and over until we got successively better and better policies in the hope that we converge to the optimal policy?**
+
+It turns out that unfortunately, this won't work as it stands now! 
+
+_But we have almost all the tools to make work! There's really just one thing that we have to fix._
+
+When we take a Q-table and use the action that maximizes each row to come up with the policy, we say that we are constructing the policy that's greedy with respect to the Q-table, and that has some special notation: ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%7B%5Cpi%20%7D%27%5Cleftarrow%20greedy%28Q%29).
+
+We'll plug this in to the loop we started with where the only thing that's changed is the notation is a bit fancier. We still begin with a starting policy, estimated its value function, then get a new policy that's greedy with respect to the value function. So, then we have a new policy and so on.
+
+Again, this proposed algorithm is so close to giving us the optimal policy, as long as we run it for long enough. 
+
+But to fix it, we'll need to slightly modify the step or reconstruct the greedy policy. 
+
+See the video [here](https://youtu.be/DH6c-aODMLU).
+
+# Epsilon-Greedy Policies
+So, in general, when the agent is interacting with the environment and still trying to figure out what works and what doesn't in its quest to collect as much reward as possible, creating policies are quite dangerous. See why in [this video](https://youtu.be/PxJMtlR06MY) (from 00:15 second).
+
+
+
+
+
+
+
+
+
+
+
+
+
