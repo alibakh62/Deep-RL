@@ -351,15 +351,87 @@ See the video [here](https://youtu.be/DH6c-aODMLU).
 # Epsilon-Greedy Policies
 So, in general, when the agent is interacting with the environment and still trying to figure out what works and what doesn't in its quest to collect as much reward as possible, creating policies are quite dangerous. See why in [this video](https://youtu.be/PxJMtlR06MY) (from 00:15 second).
 
+**Bottom line:** The problem with the greedy policy is that you may end up not exploring some state-actions at all, which may have yield better returns. So, instead of constructing a greedy policy, **a better policy would be _stochastic_ one** (picking actions with probabilities).
 
+Stochastic policy is still pretty close to the greedy policy so we're still acting pretty optimally, but there's the added value that if we continue to explore other options with some small probability, we might end up with higher return.
 
+Instead of always constructing greedy policy that always selects the greedy action, we construct a so-called **Epsilon-Greedy Policy** that's _most likely_ to pick the greedy action, but with some _small but non-zero_ probability, picks one of the other actions instead. 
 
+In this case, you will set some small positive number, ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Cvarepsilon), which **must** be between [0,1]. Then, with probability ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%201-%5Cvarepsilon) the agent selects the greedy action and with probability ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Cvarepsilon) it selects any action randomly. So, the larger it is the more likely you are to pick one of non-greedy actions. 
 
+So, as long as ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Cvarepsilon) is set to a small number, we have a method for constructing a policy that's really close to the greedy policy, but with the added benefit that it doesn't prevent the agent from continuing to explore the range of possibilities. 
 
+<p align="center">
+<img src="img/epsilon-greedy.png" alt="drawing" width="700"/>
+</p>
 
+# MC Control
+<p align="center">
+<img src="img/mc-control1.png" alt="drawing" width="700"/>
+</p>
 
+<p align="center">
+<img src="img/mc-control2.png" alt="drawing" width="400"/>
+</p>
 
+<p align="center">
+<img src="img/mc-control3.png" alt="drawing" width="700"/>
+</p>
 
+# Exploration vs Exploitation
+## Solving Environments in OpenAI Gym
+In many cases, we would like our reinforcement learning (RL) agents to learn to maximize reward as quickly as possible. This can be seen in many OpenAI Gym environments.
 
+For instance, the  [FrozenLake-v0](https://gym.openai.com/envs/FrozenLake-v0/)  environment is considered solved once the agent attains an average reward of 0.78 over 100 consecutive trials.
 
+<p align="center">
+<img src="img/exex1.png" alt="drawing" width="400"/>
+</p>
+
+Algorithmic solutions to the [FrozenLake-v0](https://gym.openai.com/envs/FrozenLake-v0/) environment are ranked according to the number of episodes needed to find the solution.
+
+<p align="center">
+<img src="img/exex2.png" alt="drawing" width="500"/>
+</p>
+
+Solutions to [Taxi-v1](https://gym.openai.com/envs/Taxi-v1/), [Cartpole-v1](https://gym.openai.com/envs/CartPole-v1/), and [MountainCar-v0](https://gym.openai.com/envs/MountainCar-v0/) (along with many others) are also ranked according to the number of episodes before the solution is found. Towards this objective, it makes sense to design an algorithm that learns the optimal policy ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Cpi_%5Cast) as quickly as possible.
+
+## Exploration-Exploitation Dilemma
+----------
+Recall that the environment's dynamics are initially unknown to the agent. Towards maximizing return, the agent must learn about the environment through interaction.
+
+At every time step, when the agent selects an action, it bases its decision on past experience with the environment. And, towards minimizing the number of episodes needed to solve environments in OpenAI Gym, our first instinct could be to devise a strategy where the agent always selects the action that it believes (_based on its past experience_) will maximize return. With this in mind, the agent could follow the policy that is greedy with respect to the action-value function estimate. We examined this approach in a previous video and saw that it can easily lead to convergence to a sub-optimal policy.
+
+To see why this is the case, note that in early episodes, the agent's knowledge is quite limited (and potentially flawed). So, it is highly likely that actions _estimated_ to be non-greedy by the agent are in fact better than the _estimated_ greedy action.
+
+With this in mind, a successful RL agent cannot act greedily at every time step (_that is_, it cannot always **exploit** its knowledge); instead, in order to discover the optimal policy, it has to continue to refine the estimated return for all state-action pairs (_in other words_, it has to continue to  **explore**  the range of possibilities by visiting every state-action pair). That said, the agent should always act _somewhat greedily_, towards its goal of maximizing return _as quickly as possible_. This motivated the idea of an ϵ-greedy policy.
+
+We refer to the need to balance these two competing requirements as the  **Exploration-Exploitation Dilemma**. One potential solution to this dilemma is implemented by gradually modifying the value of `ϵ` when constructing ϵ-greedy policies.
+
+## Setting the Value of ϵ, in Theory
+It makes sense for the agent to begin its interaction with the environment by favoring  **exploration** over **exploitation**. After all, when the agent knows relatively little about the environment's dynamics, it should distrust its limited knowledge and  **explore**, or try out various strategies for maximizing return. With this in mind, the best starting policy is the equiprobable random policy, as it is equally likely to explore all possible actions from each state. You discovered in the previous quiz that setting `ϵ=1` yields an ϵ-greedy policy that is equivalent to the equiprobable random policy.
+
+At later time steps, it makes sense to favor **exploitation** over **exploration**, where the policy gradually becomes more greedy with respect to the action-value function estimate. After all, the more the agent interacts with the environment, the more it can trust its estimated action-value function. You discovered in the previous quiz that setting  `ϵ=0`  yields the greedy policy (or, the policy that most favors exploitation over exploration).
+
+Thankfully, this strategy (of initially favoring exploration over exploitation, and then gradually preferring exploitation over exploration) can be demonstrated to be optimal.
+
+<p align="center">
+<img src="img/exex3.png" alt="drawing" width="700"/>
+</p>
+
+## Setting the Value of ϵ, in Practice
+As you read in the above section, in order to guarantee convergence, we must let  `ϵ_i`​  decay in accordance with the GLIE conditions. But sometimes "guaranteed convergence" _isn't good enough_ in practice, since this really doesn't tell you how long you have to wait! It is possible that you could need trillions of episodes to recover the optimal policy, for instance, and the "guaranteed convergence" would still be accurate!
+
+> Even though convergence is  **not**  guaranteed by the mathematics, you can often get better results by either:
+> 
+> -   using fixed **`ϵ`**, or
+> -   letting **`ϵ_i`​**  decay to a small positive number, like 0.1.
+
+This is because one has to be very careful with setting the decay rate for `ϵ`; letting it get too small too fast can be disastrous. If you get late in training and `ϵ` is really small, you pretty much want the agent to have already converged to the optimal policy, as it will take way too long otherwise for it to test out new actions!
+
+As a famous example in practice, you can read more about how the value of `ϵ`  was set in the famous DQN algorithm by reading the Methods section of [the research paper](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf):
+
+> _The behavior policy during training was epsilon-greedy with epsilon annealed linearly from 1.0 to 0.1 over the first million frames, and fixed at 0.1 thereafter._
+
+When you implement your own algorithm for MC control later in this lesson, you are strongly encouraged to experiment with setting the value of `ϵ` to build your intuition.
 
