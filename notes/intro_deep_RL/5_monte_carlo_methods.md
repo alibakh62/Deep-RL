@@ -435,3 +435,99 @@ As a famous example in practice, you can read more about how the value of `ϵ`  
 
 When you implement your own algorithm for MC control later in this lesson, you are strongly encouraged to experiment with setting the value of `ϵ` to build your intuition.
 
+# Incremental Mean
+In our current algorithm for Monte Carlo control, we collect a large number of episodes to build the Q-table (as an estimate for the action-value function corresponding to the agent's current policy). Then, after the values in the Q-table have converged, we use the table to come up with an improved policy.
+
+Maybe it would be more efficient to update the Q-table  **_after every episode_**. Then, the updated Q-table could be used to improve the policy. That new policy could then be used to generate the next episode, and so on.
+
+<p align="center">
+<img src="img/inc-mean-1.png" alt="drawing" width="500"/>
+</p>
+
+_So, how might we modify our code to accomplish this? Watch the [video](https://youtu.be/h-8MB7V1LiE) below to see!_
+
+In this case, even though we're updating the policy before the values in the Q-table accurately approximate the action-value function, this lower-quality estimate nevertheless still has enough information to help us propose successively better policies. If you're curious to learn more, you can read section 5.6 of [the textbook](https://s3-us-west-1.amazonaws.com/udacity-dlnfd/suttonbookdraft2018jan1.pdf).
+
+## Pseudocode
+The pseudocode can be found below.
+
+<p align="center">
+<img src="img/inc-mean-2.png" alt="drawing" width="500"/>
+</p>
+
+<p align="center">
+<img src="img/inc-mean-3.png" alt="drawing" width="700"/>
+</p>
+
+# Constant-alpha
+In the [video below](https://youtu.be/QFV1nI9Zpoo), you will learn about another improvement that you can make to your Monte Carlo control algorithm.
+
+---> video transcript here
+
+Currently, your update step for **Policy Evaluation** looks a bit like this:
+
+<p align="center">
+<img src="img/alpha1.png" alt="drawing" width="500"/>
+</p>
+
+You generate an episode, then for each state-action pair that was visited, you calculate the corresponding return that follows. Then, you use that return to get an updated estimate. 
+
+_We're going to look at this update step a bit closer with the aim of improving it._
+
+You can think of as first calculating the difference between the most recently sampled return, and the corresponding value of the state-action pair (last term from the right). We denote that by ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Cdelta_t), you can think of it as an **error term**. 
+
+After all, it's the difference between what we expect the return to be, and what the return actually was.
+
+<p align="center">
+<img src="img/alpha2.png" alt="drawing" width="500"/>
+</p>
+
+In this case that this error is positive, that means that the return that we received is more than what the value function expected. In this case, the action value is too low, so we use this update step to increase the estimate. 
+
+On the other hand, if the error is negative, then that means that the return is higher than what the actual value function expected. So, it makes sense to take into account this new evidence, and decrease the estimate and the actual value function.
+
+<p align="center">
+<img src="img/alpha3.png" alt="drawing" width="500"/>
+</p>
+
+**And exactly how much do we increase or decrease the function?**
+
+Currently, the algorithm decreases it by an amount inversely proportional to the number of times that we've visited the state-action pair already, ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Cfrac%7B1%7D%7BN%28S_t%2C%20A_t%29%7D). 
+
+So, the first few times we visit the pair, the change is likely to be quite large. But at future time points, where the denominator of this fraction gets quite big, the changes get smaller and smaller. The reason this is the case is that we're just calculating the average effect and as we do average more and more (say 999 times) the effect of one more would change the average less than initially (say 10 times).
+
+So, with this in mind, we change the algorithm to instead use a **constant step size** which we denote by ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Calpha) here. This ensures that returns that come later are more emphasized that those that arrived earlier. 
+
+In this way, **the agent will mostly trust the most recent returns, and gradually forget about those that came in the past.**
+
+This is quite important because the policy is constantly changing, and with every step becoming more optimal. So, in fact, later time steps are quite important to estimating the action values. 
+
+<p align="center">
+<img src="img/alpha4.png" alt="drawing" width="500"/>
+</p>
+
+## Pseudocode
+The pseudocode for constant-\alphaα GLIE MC Control can be found below.
+
+<p align="center">
+<img src="img/alpha5.png" alt="drawing" width="500"/>
+</p>
+
+<p align="center">
+<img src="img/alpha6.png" alt="drawing" width="700"/>
+</p>
+
+To understand how to set the value of ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Calpha), let's look at closely at the updated equation. 
+
+Note that ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Calpha) must be set to a number between [0,1]. When it's set to 1, the new estimate is just the most recent return, where we completely ignore and replace the value in the queue table. 
+
+If we were to set ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Calpha) to 0, we'd completely ignore the return and keep the old estimate unchanged. In this case, our agent would never learn.
+
+It'd prove useful to set alpha to a small number that's close to 0. In general, the smaller the ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20%5Calpha) is, the less we trust the most recent return when performing an update, and the more we rely on our existing estimate in the queue table. See the video [here](https://youtu.be/LetHoOtNdJc).
+
+<p align="center">
+<img src="img/alpha7.png" alt="drawing" width="800"/>
+</p>
+
+
+
