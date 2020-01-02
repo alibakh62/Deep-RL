@@ -529,5 +529,38 @@ It'd prove useful to set alpha to a small number that's close to 0. In general, 
 <img src="img/alpha7.png" alt="drawing" width="800"/>
 </p>
 
+# Coding Exercise
+Please use the next concept to complete the following section of  `Monte_Carlo.ipynb`:
+
+-   Part 2: MC Control
+
+To reference the pseudocode while working on the notebook, you are encouraged to look at  [this sheet](https://github.com/udacity/deep-reinforcement-learning/blob/master/cheatsheet/cheatsheet.pdf).
+
+## Download the Exercise
+If you would prefer to work on your own machine, you can download the exercise from the  [DRLND GitHub repository](https://github.com/udacity/deep-reinforcement-learning).
+
+## Check Your Implementation
+Once you have completed the exercise, you can check your solution by looking at the corresponding sections in  `Monte_Carlo_Solution.ipynb`. Watch the video below to see a solution walkthrough!
+
+See the video [here](https://youtu.be/6E_3NJcoxmU).
+
+See the notebook [here](codes/Monte_Carlo_Solution_part2.ipynb).
+
+# Summary
+<p align="center">
+<img src="img/mc-summary1.png" alt="drawing" width="500"/>
+</p>
+
+<p align="center">
+<img src="img/mc-summary2.png" alt="drawing" width="700"/>
+</p>
+
+<p align="center">
+<img src="img/mc-summary3.png" alt="drawing" width="700"/>
+</p>
+
+<p align="center">
+<img src="img/mc-summary4.png" alt="drawing" width="700"/>
+</p>
 
 
