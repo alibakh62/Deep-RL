@@ -126,6 +126,37 @@ We'll still begin with the same initial values for the action values and the pol
 
 Namely, we'll update the policy before choosing the next action. **Can you guess what action makes sense to put here?**
 
+<p align="center">
+<img src="img/ql2.png" alt="drawing" width="600"/>
+</p>
+
 In the _Sarsa_ case, our update step was one step later and plugged in the action that was selected using Epsilon-greedy policy. For every step of the algorithm, it was the case that all of the actions was used for updating the action values, excatly coincide with those that were experienced by the agent. But, in general, this does not have to be the case. In particular, consider using the action from the greedy policy, instead of the Epsilon-greedy policy. **This is in fact what _Sarsamax_ or _Q-Learning_ does.**
 
+We can rewrite the equation above to look like below, where we rely on on the fact that the greedy action corresponding to a state is just the one that maximizes the action values for that state. 
+
+<p align="center">
+<img src="img/ql3.png" alt="drawing" width="600"/>
+</p>
+
+So, what happens is after we update the action value for time step (0) using the greedy action, we then select `A1`, using the Epsilon-greedy policy corresponding to the action values we just updated. This continues when we received a reward and next state.Then, we do the same thing we did before where we update the value corresponding to `S1` and `A1` using the greedy action, then we select `A2` using the corresponding Epsilon-greedy policy.
+
+<p align="center">
+<img src="img/ql4.png" alt="drawing" width="600"/>
+</p>
+
+To understand precisely what this update stuff is doing, we'll compare it to the corresponding step in the _Sarsa_ algorithm.
+
+In _Sarsa_, the update step pushes the action values closer to evaluating whatever Epsilon-greedy policy is currently being followed by the agent. It's possible to show that **Sarsamax** instead, directly attempts to approximate the optimal value function at every time step. 
+
+<p align="center">
+<img src="img/ql5.png" alt="drawing" width="600"/>
+</p>
+
+See the video [here](https://youtu.be/4DxoYuR7aZ4).
+
+Check out this (optional) [research paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.80.7501&rep=rep1&type=pdf) to read the proof that Q-Learning (or Sarsamax) converges.
+
+<p align="center">
+<img src="img/ql6.png" alt="drawing" width="700"/>
+</p>
 
