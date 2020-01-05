@@ -160,3 +160,113 @@ Check out this (optional) [research paper](http://citeseerx.ist.psu.edu/viewdoc/
 <img src="img/ql6.png" alt="drawing" width="700"/>
 </p>
 
+# TD Control: Expected Sarsa
+Please watch the [video below](https://youtu.be/kEKupCyU0P0) to learn about **Expected Sarsa**, a third method for TD control.
+
+--> from the video
+
+So far, you implemented _Sarsa_ and _Sarsamax_ and we'll now discuss one more option. This new option is called **expected Sarsa** and it closely resembles _Sarsamax_, where the only difference is in the update step for the action value.
+
+Remember that _Sarsamax_ or _Q Learning_ took the maximum over all actions of all possible next state-action pairs. In other words, it chooses what value to place here by plugging in the one action that maximizes the action value estimate corresponding to the next state. 
+
+**Expected Sarsa** does something a bit different. It uses the expected value of the next state-action pair, where the expectation takes into account the probability that the agent selects each possible action from the next state.
+
+<p align="center">
+<img src="img/tdc1.png" alt="drawing" width="700"/>
+</p>
+
+Check out this (optional) [research paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.216.4144&rep=rep1&type=pdf) to learn more about Expected Sarsa.
+
+## Pseudocode
+<p align="center">
+<img src="img/tdc2.png" alt="drawing" width="700"/>
+</p>
+
+# TD Control: Theory and Practice
+<p align="center">
+<img src="img/tdc3.png" alt="drawing" width="700"/>
+</p>
+
+## Optimism
+You have learned that for any TD control method, you must begin by initializing the values in the Q-table. It has been shown that  [initializing the estimates to large values](http://papers.nips.cc/paper/1944-convergence-of-optimistic-and-incremental-q-learning.pdf)  can improve performance. For instance, if all of the possible rewards that can be received by the agent are negative, then initializing every estimate in the Q-table to zeros is a good technique. In this case, we refer to the initialized Q-table as  **optimistic**, since the action-value estimates are guaranteed to be larger than the true action values.
+
+# OpenAI Gym: CliffWalkingEnv
+In order to master the algorithms discussed in this lesson, you will write your own implementations in Python. While your code will be designed to work with any OpenAI Gym environment, you will test your code with the CliffWalking environment.
+
+<p align="center">
+<img src="img/matengai-of-kuniga-coast-in-oki-island-shimane-pref600.jpg" alt="drawing" width="600"/>
+</p>
+
+In the CliffWalking environment, the agent navigates a 4x12 gridworld. Please read about the cliff-walking task in Example 6.6 of the [textbook](http://go.udacity.com/rl-textbook). When you have finished, you can learn more about the environment in its corresponding [GitHub file](https://github.com/openai/gym/blob/master/gym/envs/toy_text/cliffwalking.py), by reading the commented block in the CliffWalkingEnv class. For clarity, we have also pasted the description of the environment below (note that the link below to the Sutton and Barto textbook may not work, and you're encouraged to use [this link](http://go.udacity.com/rl-textbook) to access the textbook):
+
+```
+    """
+    This is a simple implementation of the Gridworld Cliff
+    reinforcement learning task.
+    Adapted from Example 6.6 from Reinforcement Learning: An Introduction
+    by Sutton and Barto:
+    http://people.inf.elte.hu/lorincz/Files/RL_2006/SuttonBook.pdf
+
+    With inspiration from:
+    https://github.com/dennybritz/reinforcement-learning/blob/master/lib/envs/cliff_walking.py
+    The board is a 4x12 matrix, with (using Numpy matrix indexing):
+        [3, 0] as the start at bottom-left
+        [3, 11] as the goal at bottom-right
+        [3, 1..10] as the cliff at bottom-center
+    Each time step incurs -1 reward, and stepping into the cliff incurs -100 reward 
+    and a reset to the start. An episode terminates when the agent reaches the goal.
+    """
+```
+
+# Coding Exercise
+Please check the [Temporal Difference notebook](codes/Temporal_Difference_Solution.ipynb).
+
+# Analyzing Performance
+You've learned about three different TD control methods in this lesson.  _So, what do they have in common, and how are they different?_
+
+## Similarities
+All of the TD control methods we have examined (Sarsa, Sarsamax, Expected Sarsa) converge to the optimal action-value function  `q∗`​  (and so yield the optimal policy  `π∗​`) if:
+
+1.  the value of `ϵ` decays in accordance with the GLIE conditions, and
+2.  the step-size parameter `α` is sufficiently small.
+
+## Differences
+The differences between these algorithms are summarized below:
+
+-   Sarsa and Expected Sarsa are both  **on-policy**  TD control algorithms. In this case, the same (ϵ-greedy) policy that is evaluated and improved is also used to select actions.
+-   Sarsamax is an **off-policy** method, where the (greedy) policy that is evaluated and improved is different from the (ϵ-greedy) policy that is used to select actions.
+-   On-policy TD control methods (like Expected Sarsa and Sarsa) have better online performance than off-policy TD control methods (like Sarsamax).
+-   Expected Sarsa generally achieves better performance than Sarsa.
+
+If you would like to learn more, you are encouraged to read Chapter 6 of the  [textbook](http://go.udacity.com/rl-textbook) (especially sections 6.4-6.6).
+
+As an optional exercise to deepen your understanding, you are encouraged to reproduce Figure 6.4. (Note that this exercise is optional!)
+
+<p align="center">
+<img src="img/figure6-4.png" alt="drawing" width="700"/>
+</p>
+
+The figure shows the performance of Sarsa and Q-learning on the cliff walking environment for constant  `ϵ=0.1`. As described in the textbook, in this case,
+
+- Q-learning achieves worse online performance (where the agent collects less reward on average in each episode), but learns the optimal policy, and
+- Sarsa achieves better online performance, but learns a sub-optimal "safe" policy.
+
+You should be able to reproduce the figure by making only small modifications to your existing code.
+
+# Summary
+<p align="center">
+<img src="img/td-summary.png" alt="drawing" width="600"/>
+</p>
+
+### Temporal-Difference Methods
+- Whereas Monte Carlo (MC) prediction methods must wait until the end of an episode to update the value function estimate, temporal-difference (TD) methods update the value function after every time step.
+
+### TD Control
+- **Sarsa(0)** (or **Sarsa**) is an on-policy TD control method. It is guaranteed to converge to the optimal action-value function `q∗`​, as long as the step-size parameter `α` is sufficiently small and `ϵ` is chosen to satisfy the  **Greedy in the Limit with Infinite Exploration (GLIE)**  conditions.
+- **Sarsamax** (or **Q-Learning**) is an off-policy TD control method. It is guaranteed to converge to the optimal action value function `q∗`​, under the same conditions that guarantee convergence of the Sarsa control algorithm.
+- **Expected Sarsa** is an on-policy TD control method. It is guaranteed to converge to the optimal action value function `q∗`​, under the same conditions that guarantee convergence of Sarsa and Sarsamax.
+
+### Analyzing Performance
+-   On-policy TD control methods (like Expected Sarsa and Sarsa) have better online performance than off-policy TD control methods (like Q-learning).
+-   Expected Sarsa generally achieves better performance than Sarsa.
+
