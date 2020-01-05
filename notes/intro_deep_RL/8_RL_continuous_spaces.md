@@ -51,4 +51,32 @@ So, the first thing you'll learn in this lesson is how to generalize these algor
 
 See the video [here](https://youtu.be/GPjK124RU5g).
 
+# Discrete vs Continuous Spaces
+Recall the definition of the MDP where we assume that the environment state at any time is drawn from a set of possible states. When this set is **finite**, we can call it a **discrete state space**. Similarly with actions. 
 
+Having discrete spaces simplifies things for us. It allows us to represent any function of states and actions as a dictionary or look up table. 
+
+Consider the state value function **V** which is a mapping from the set of states to a real number. If you encode states as integers, you can code up the value function as a dictionary using each state as a key. Similarly, consider the action value function **Q** that maps every state action pair to a real number. Again, you could use a dictionary or store the value function as a table or matrix, where each row corresponds to a state, and each column to an action.
+
+Discrete spaces are also critical to a number of RL algorithms. For instance, in value iteration, the internal for-loop goes over each state as one by one, and updates the corresponding value estimate **V(s)**. This is impossible if you have an infinite state space. The loop would go on forever. Even for discrete state spaces with a lot of states this can quickly become infeasible.
+
+<p align="center">
+<img src="img/disc-vs-cont1.png" alt="drawing" width="700"/>
+</p>
+
+_Model-free methods_ like Q-learning assume discrete spaces as well. Here, the "max" is being computed over all possible actions from state **S'** which is easy when you have a finite set of actions. But, this tiny step by itself becomes a full-blown optimization problem if your action space is continuous.
+
+<p align="center">
+<img src="img/disc-vs-cont2.png" alt="drawing" width="700"/>
+</p>
+
+**So, what do we exactly mean by continuous space?** 
+
+The term continuous is used to contrast with discrete, that is a continuous space is not restricted to a set of distinct values like integers. Instead, it can take a range of values, typically real numbers. This means quantities like state values that could be depicted as say a bar chart for discrete case, will now need to be thought of as a density plot over a desired range. 
+
+The same notion extends to environments where the state is no longer a single real valued number but a _**vector**_ of such numbers. **This is still referred to as a continuous space just with more than one dimension**. 
+
+## Why Continuous?
+Let's try to build some intuition for why continuous state spaces are important. Where do they even come from?
+
+When you consider a high-level decision making task like playing chess, you can often think of the set of possible states as discrete. What piece is in which square on the board? You don't need to bother with precisely where each piece is located within its squares or which way it is facing. 
