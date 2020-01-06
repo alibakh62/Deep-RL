@@ -79,4 +79,39 @@ The same notion extends to environments where the state is no longer a single re
 ## Why Continuous?
 Let's try to build some intuition for why continuous state spaces are important. Where do they even come from?
 
-When you consider a high-level decision making task like playing chess, you can often think of the set of possible states as discrete. What piece is in which square on the board? You don't need to bother with precisely where each piece is located within its squares or which way it is facing. 
+When you consider a high-level decision making task like playing chess, you can often think of the set of possible states as discrete. What piece is in which square on the board? You don't need to bother with precisely where each piece is located within its squares or which way it is facing. These are non-relevant details for the problem at hand and you can abstract then away in your model of the game. 
+
+In general, grid-based worlds are very popular in RL. They give a glimpse at how agents might act in spatial environment. But, real physical spaces are not always neatly divided up into grids. There is no cell (5,3) for vacuum cleaner to go to. It has to chart a course from its current position to say (2.5, 1.8). It also has to keep track of its heading and turn smoothly to face the direction it wants to move in. These are all real numbers that the agent may need to process and represent as part of the state. 
+
+Actions too can be continuous. Take for example a robot that plays darts. It has to set the height and angle it wants to release the dart at, choose an appropriate level of power with which to throw, etc. Even small differences in these values can have a large impact on where the dart ultimately lands on the board. In general, most actions that need to take place in a physical environment are continuous in nature. 
+
+Clearly, we need to modify our representation or algorithms or both to accomodate continuous spaces. The two main strategies we'll be looking at are: **Discretization** and **Function Approximation**. 
+
+See the video [here](https://youtu.be/uHstLeRzaE8).
+
+# Discretization
+As the name suggests, discretization is basically converting a continuous space into a discrete one. 
+
+Remember our continuous vacuum cleaner world. All we're saying is let's bring back a grid structure with discrete positions identified. Note that we're not really forcing our agent to be in exactly the center of these positions, since the underlying world is continuous, and we don't have control over that. 
+
+But in our representation of the state space, we only identify certain positions as relevant. For instance, whether the robot is at (3.1, 2.4) or (2.9,1.8), we can round that off to (3,2). 
+
+Yes, this will almost always be a little incorrect, but for some environments, discretizing the state space can work out very well. It enables us to use existing algorithms with little, or no modification.
+
+Actions can be discretized as well. For example, angles can be divided into whole degrees, or even 90 degrees increments, if appropriate. 
+
+Now, let's imagine there are objects in this discretized world, obstacles that the robot may need to avoid. With our grid representation, all we can do is mark off the cells where an object is present, even by a little. This is known as an **occupancy grid**. 
+
+But our choice of discretization may lead the agent into thinking, there is no path across these obstacles to reach some desired locations. Instead, if we vary the grid according to these obstacles, then we could open up a feasible path for the agent. 
+
+An alternate approach would be to divide up the grid into smaller cells where required. It would still be an approximation, but it'll allow us to allocate more of our state representation to where it matters. Better than dividing the entire state space into finer cells, which may increase the total number of states, and in turn, the time needed to compute value functions. If you're familiar with **binary space partitioning** or **quad trees**, this is exactly the same idea. 
+
+Now you might be wondering: this sort of discretization makes sense in spatial domains like gridworlds, but **what about other state spaces?**
+
+Let's look at a different domain.
+
+Most cars these days have automatic transmission. **Have you ever wondered how the car decides to pick what gear to switch to, and when?** Here is a simplified plot of how fuel consumption varies with speed for different gears in a typical car.
+
+<p align="center">
+<img src="img/disc1.png" alt="drawing" width="400"/>
+</p>
