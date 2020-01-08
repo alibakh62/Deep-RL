@@ -115,3 +115,11 @@ Most cars these days have automatic transmission. **Have you ever wondered how t
 <p align="center">
 <img src="img/disc1.png" alt="drawing" width="400"/>
 </p>
+
+Let's assume that our state only consists of the vehicle speed, and which gear we are in. And our reward is inversely proportional to fuel consumption. The actions available to our agent are essentially switching up, or down. 
+
+Now, although speed is a continuous value, it can be discretize into ranges, such that a single gear is the most optimal in each range. Note that these ranges can be of different lengths, that is, the discretization is non-uniform. It there were other dimensions to the state-space such as throttle position, then they could be subdivided non-uniformly as well. 
+
+<p align="center">
+<img src="img/disc2.png" alt="drawing" width="400"/>
+</p>
