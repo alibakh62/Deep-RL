@@ -123,3 +123,77 @@ Now, although speed is a continuous value, it can be discretize into ranges, suc
 <p align="center">
 <img src="img/disc2.png" alt="drawing" width="400"/>
 </p>
+
+# Exercise: Discretization
+Refer to [Discretization_Solution](codes/Discretization_Solution.ipynb) notebook.
+
+# Tile Coding
+If you have prior knowledge about the state space, you can manually design an appropriate discretization scheme. 
+
+Like in our gear switching example, we knew the relationship between fuel consumption and speed. But, in order to function in arbitrary environments, we need a more generic method. 
+
+One elegant approach for this is **Tile Coding**. Here, the underlying state space is continuous and two-dimensional. We overlay multiple grids or tilings on top of the space, each slightly offset from each other. 
+
+Now, any position `S` in the state space can be coarsely identified by the tiles that it activates. If we assign a bit to each tile, then we can represent our new discretized state as a bit vector, with ones for the tiles that get activated, and zeros elsewhere. 
+
+<p align="center">
+<img src="img/tile1.png" alt="drawing" width="600"/>
+</p>
+
+This, by itself, is a very efficient representation. But the genius lies in how the state value function is computed using the scheme. Instead of storing a separate value for each state `V(s)`, it is defined in terms of the bit vector for that state and a weight for each tile. 
+
+The tile coding algorithm in turn updates these weights iteratively. This ensures nearby locations that share tiles also share some component of state value, effectively smoothing the learned value function. 
+
+<p align="center">
+<img src="img/tile2.png" alt="drawing" width="700"/>
+</p>
+
+Tile coding does have some **drawbacks**. Just like a simple grid-based approach we have to manually select the tile sizes, their offsets, number of tilings, etc. ahead of time. 
+
+A more flexible approach is **adaptive tile coding**, which starts with fairly large tiles and divides each tile into two, whenever appropriate. **How do we know when to split?**
+
+We can use a heuristic for that. Basically, we want to split the state space when we realize that we are no longer learning much with the current representation. That is, when our value function isn't changing. We can stop when we have reached some upper limit on the number of splits, or some max iterations.
+
+<p align="center">
+<img src="img/tile3.png" alt="drawing" width="500"/>
+</p>
+
+In order to figure out which tile to split, we have to look at which one is likely to have the greatest effect on the value function. For this, we need to keep track of subtiles and their projected weights. Then, we can pick the tile with the greatest difference between subtile weights. 
+
+There are many other hueristics you can use, but the main advantage of _adaptive tile coding_ is that it does not rely on a human to specify a discretization ahead of time. The resulting state space is appropriately partitioned based on its complexity. 
+
+See the video [here](https://youtu.be/BRs7AnTZ_8k).
+
+# Coarse Coding
+**Coarse Coding** is just like _tile coding_, but uses a sparser set of features to encode the state space. Imagine dropping a bunch of circles on your 2D continuous state space. Take any state `S` which is a position in this space, and mark all the circles that is belongs to. Prepare a bit vector with a one for those circles and zeros for the rest. And that's your **sparse coding representation** of the state. 
+
+<p align="center">
+<img src="img/coarse1.png" alt="drawing" width="500"/>
+</p>
+
+Looking at a 2D space helps us visualize the basic idea. But it also extends to higher dimensions where circles become spheres and hyper spheres. 
+
+There are some neat properties of coarse coding. Using smaller circles results in less generalization across the space. The learning algorithm has to work a bit longer, but you have greater effective resolution. Larger circles lead to more generalization, and in general a smoother value function. You can use fewer large circles to cover the space, thus reducing your representation, but you would lose some resolution. 
+
+<p align="center">
+<img src="img/coarse2.png" alt="drawing" width="500"/>
+</p>
+
+It's not just the size of these circles that we can vary. We can change them in other ways like making them taller or wider to get more resolution along one dimension versus the other. In fact, this same technique generalizes to pretty much any shape. 
+
+<p align="center">
+<img src="img/coarse3.png" alt="drawing" width="500"/>
+</p>
+
+In coarse coding, just like in tile coding, are resulting state representation is a binary vector. Think of each tile or circle as a feature, 1, if it is an active, 0 if it is not. 
+
+A natural extension to this idea is to use the distance from the center of each circle as a measure of how active that feature is. This measure/response can be made to fall off smoothly using a Gaussian or a bell-shaped curve centered on the circle, which is known as a **radial basis function**. 
+
+<p align="center">
+<img src="img/coarse4.png" alt="drawing" width="700"/>
+</p>
+
+Of course, the resulting feature values will no longer be discrete. So, we'll end up with yet another continuous state vector. But what is cool is that the number of features can be drastically reduced this way. 
+
+See the video [here](https://youtu.be/Uu1J5KLAfTU).
+
