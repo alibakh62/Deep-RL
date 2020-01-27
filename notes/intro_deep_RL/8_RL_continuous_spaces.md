@@ -197,3 +197,29 @@ Of course, the resulting feature values will no longer be discrete. So, we'll en
 
 See the video [here](https://youtu.be/Uu1J5KLAfTU).
 
+# Function Approximation
+So far, we've looked at ways to discretize continuous state spaces. This enables us to use existing RL algorithms with little or no modification. But there are some limitations. 
+
+When the underlying space is complicated, the number of discrete states needed can become very large. Thus, we lose the advantage of discretization. Moreover, if you think about positions in the state space that are nearby, you would expect their values to be similar, or smoothly changing. 
+
+Discretization doesn't always exploit this characteristic, failing to generalize well across the space. What we're after is the true state value function ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20v_%7B%5Cpi%7D), or action value function ![](https://latex.codecogs.com/gif.latex?q_%5Cpi), which is typically smooth and continuous over the entire space. 
+
+<p align="center">
+<img src="img/func1.png" alt="drawing" width="700"/>
+</p>
+
+As you can imagine, capturing this completely is practically infeasible except for some very simple problems. Our best hope is **function approximation**. It is still an approximation because we don't know what the true underlying function is. 
+
+A general way to define such as approximation is to introduce a parameter vector ![](https://latex.codecogs.com/gif.latex?%5Cbold%20W) that shapes the function. Our tasks then, reduces to tweaking this parameter vector till we find the desired approximation. 
+
+<p align="center">
+<img src="img/func2.png" alt="drawing" width="700"/>
+</p>
+
+Note that the approximating function can either map a state to its value, or a state action pair to the corresponding ![](https://latex.codecogs.com/gif.latex?q) value. Another form is where we map from one state to a number of different ![](https://latex.codecogs.com/gif.latex?q) values, one for each action all at once. This is especially useful for Q-learning. 
+
+<p align="center">
+<img src="img/func3.png" alt="drawing" width="700"/>
+</p>
+
+Let's focus on this first case: Approximating a state value function. 
