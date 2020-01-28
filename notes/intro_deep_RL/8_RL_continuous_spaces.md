@@ -222,4 +222,109 @@ Note that the approximating function can either map a state to its value, or a s
 <img src="img/func3.png" alt="drawing" width="700"/>
 </p>
 
-Let's focus on this first case: Approximating a state value function. 
+**Let's focus on this first case: Approximating a state value function.**
+
+Now, we have this box here in the middle that's supposed to do some magic (figure below), and convert the state ![](https://latex.codecogs.com/gif.latex?s), and parameter vector ![](https://latex.codecogs.com/gif.latex?%5Cbold%20W) into a scalar value. **But how?**
+
+<p align="center">
+<img src="img/func4.png" alt="drawing" width="700"/>
+</p>
+
+The first thing we need to do is to ensure we have a vector representing the state. Your state might already be a vector in which case you don't need to do anything. 
+
+In general, we'll define a transformation that converts any given state ![](https://latex.codecogs.com/gif.latex?s) into a feature vector ![](https://latex.codecogs.com/gif.latex?%5Cbold%20X%28s%29). This also gives us more flexibility, since we don't have to operate on the raw state values. We can use any computed or derived features instead. 
+
+We now have a feature vector ![](https://latex.codecogs.com/gif.latex?%5Cbold%20X%28s%29), and a parameter vector ![](https://latex.codecogs.com/gif.latex?%5Cbold%20W), and we want a scalar value. 
+
+**What do we do when we have two vectors, and want to produce a scalar?** _**Dot Product**_ :)
+
+It's the simplest thing we could do. In fact, this is the same as computing a linear combination of features. This is known as **Linear Function Approximation**, i.e. we're trying to approximate the underlying value function with a linear function.  
+
+<p align="center">
+<img src="img/func5.png" alt="drawing" width="700"/>
+</p>
+
+See the video [here](https://youtu.be/UTGWVY6jEdg).
+
+<p align="center">
+<img src="img/func6.png" alt="drawing" width="700"/>
+</p>
+
+# Linear Function Approximation
+Let's take a closer look at linear function approximation and how to estimate the parameter vector ![](https://latex.codecogs.com/gif.latex?%5Cbold%20W). 
+
+As you've seen already, a linear function is a simple sum over all the features multiplied by their corresponding weights: ![](https://latex.codecogs.com/gif.latex?%5Chat%7Bv%7D%5Cleft%20%28%20s%2C%20%5Cbold%20W%20%5Cright%20%29%3D%5Cbold%20X%28s%29%5E%5Ctop%5Ccdot%20%5Cbold%20W)
+
+<p align="center">
+<img src="img/func5.png" alt="drawing" width="700"/>
+</p>
+
+Let's assume you have initialized these weights randomly and computed the value of a state ![](https://latex.codecogs.com/gif.latex?%5Chat%7Bv%7D%5Cleft%20%28%20s%2C%20%5Cbold%20W%20%5Cright%20%29). **How would you tweak ![](https://latex.codecogs.com/gif.latex?%5Cbold%20W) to bring the approximation closer and closer to the true function?**
+
+Sound like a _**numerical optimization problem**_. Let's use _**gradient descent**_ to find the optimal parameter vector. 
+
+Firstly, note that since  ![](https://latex.codecogs.com/gif.latex?%5Chat%7Bv%7D) is a linear function, its derivative with respect to ![](https://latex.codecogs.com/gif.latex?%5Cbold%20W) is simply the feature vector ![](https://latex.codecogs.com/gif.latex?%5Cbold%20X%28s%29). This is the nice thing about linear functions and why they are so popular. 
+
+Now, let's think about **what are we trying to optimize?**
+
+We want to reduce (minimize) the difference between the true value function ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cdpi%7B120%7D%20v_%7B%5Cpi%7D) and the approximate value function ![](https://latex.codecogs.com/gif.latex?%5Chat%7Bv%7D). Let's write that down as a squared difference, since we are not concerned with the sign of the error and we simply want to drive the difference down toward zero. To be more accurate, since RL domains are typically stochastic, this is the **expected squared error**. 
+
+<p align="center">
+<img src="img/func7.png" alt="drawing" width="700"/>
+</p>
+
+We now have an objective function to minimize. To do that using gradient descent, let's find the gradient of this function with respect to ![](https://latex.codecogs.com/gif.latex?%5Cbold%20W). Using the chain rule of differentiation, we get the following:
+
+<p align="center">
+<img src="img/func8.png" alt="drawing" width="700"/>
+</p>
+
+**NOTE:** Note that we remove the expectation operator here to focus on the error gradient indicated by a single state ![](https://latex.codecogs.com/gif.latex?s), which we assume has been chose stochastically.
+
+If we are able to sample enough states, we can come close to the expected value. Let's plug this into the general form of a gradient descent update rule with ![](https://latex.codecogs.com/gif.latex?%5Calpha) as a step size or learning rate parameter.
+
+This is the basic formulation we will use to iteratively reduce the error for each sample state till the approximate and true function are almost equal.
+
+<p align="center">
+<img src="img/func9.png" alt="drawing" width="700"/>
+</p>
+
+**NOTE:** Note that the -1/2 here is just to cancel out the -2 we got in the derivative. 
+
+See the [video](https://youtu.be/OJ5wrB7o-pI) for some intuition on how gradient decent optimizes the parameter vector.
+
+## Action Value Approximation
+So far, we've only been talking about approximating the state-value function. **In order to solve a model-free control problem, i.e. to take actions in an unknown environment, we need to approximate the action-value function.**
+
+We can do this by defining a feature transformation that utilizes both the state and action, then we can use the same gradient descent method as we did for the state-value function. 
+
+<p align="center">
+<img src="img/func10.png" alt="drawing" width="700"/>
+</p>
+
+***
+Finally, let's look at the case where we wish the approximation function to compute all of the action-values at once. We can think of this as **producing an action vector**. 
+
+<p align="center">
+<img src="img/func11.png" alt="drawing" width="700"/>
+</p>
+
+For this purpose, we can continue to use the same feature transformation as before, taking in both the state and action. But, **how do we generate the different action-values?**
+
+One way of thinking about it is that we are trying to find ![](https://latex.codecogs.com/gif.latex?n) action-value functions, one for each action dimension. But, intuitively, we know that these functions are related. So, it makes sense to compute them together. We can do this by extending our weight vector and turning it into a matrix. Each column of the matrix emulates a separate linear function, but the common features computed from the state and action keep these functions tied to each other. 
+
+If we have a problem domain with a continuous state space, but a discrete action space, which is very common, we can easily select the action with the maximum value. Without this sort of parallel processing, we would have to parcel each action one by one and then find their maximum. 
+
+<p align="center">
+<img src="img/func12.png" alt="drawing" width="700"/>
+</p>
+
+If our action space is also continuous, then this form allows us to output more than a single value at once. For example, if we were driving a car, we'd want to control both steering and throttle at the same time. 
+
+The **primary limitation** of linear function approximation is that we can only represent linear relationships between inputs and outputs. With one-dimensional input, this is basically a line. In 2D, it becomes a plane, and so on. 
+
+**What if our underlying value function has a non-linear shape?** A linear approximation may give a very bad result. That's when we need to start looking at non-linear functions.
+
+See the video [here](https://youtu.be/OJ5wrB7o-pI).
+
+
