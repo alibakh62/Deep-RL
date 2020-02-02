@@ -327,4 +327,72 @@ The **primary limitation** of linear function approximation is that we can only 
 
 See the video [here](https://youtu.be/OJ5wrB7o-pI).
 
+# Kernel Functions
+A simple extension to linear function approximation can help us capture non-linear relationships. At the heart of the approach is our feature transformation. 
+
+Here is how we defined it in a generic sense. Something that takes a state or a action-state pair and produces a feature vector. 
+
+<div align="center">
+
+![](https://latex.codecogs.com/gif.latex?%5Cbold%20X%20%28s%29%20%3D%20%5Cbegin%7Bpmatrix%7D%20x_1%28s%29%5C%5C%20%5Cvdots%20%5C%5C%20x_n%28s%29%5C%5C%20%5Cend%7Bpmatrix%7D)
+</div>
+
+Each elements of this vector can be produced by a separate function, which can be non-linear. For example, let's assume our state ![](https://latex.codecogs.com/gif.latex?s) is a single real number. Then, we can define, say ![](https://latex.codecogs.com/gif.latex?x_1%28s%29%3Ds), ![](https://latex.codecogs.com/gif.latex?x_2%28s%29%3Ds%5E2), etc. These are called **Kernel Functions** or **Basis Functions**. They transform the input state into a different space. But note that since our value function is still defined as a linear combination of these features, we can still linear function approximation. What this allows the value function to do is represent non-linear relationships between the input state and output value.
+
+**Radial Basis Functions** are a very common form of kernels used for this purpose. Essentially, think of the current state ![](https://latex.codecogs.com/gif.latex?s) as a location in the continuous state space here depicted as a rectangular place (figure below).
+
+<p align="center">
+<img src="img/kernel1.png" alt="drawing" width="700"/>
+</p>
+
+Each basis function is shown as a blob. The closer the state is to the center of the blob, the higher the response returned by the function. And the further you go, the response falls off gradually with the radius, hence the name _Radial Basis Function_. 
+
+Mathematically, this can be achieved by associating a Gaussian kernel with each basis function with its mean serving as the center of the blob and standard deviation determining how sharply or smoothly the response falls off.
+
+So, for any given state, we can reduce the state representation to a vector of responses from these radial basis functions. From that point onwards, we can use same function approximation method. 
+
+See the video [here](https://youtu.be/RdkPVYyVOvU).
+
+# Non-Linear Function Approximation
+Non-linear approximation, this is what we've been building up to in this lesson. Recall from our previous discussion how we can capture non-linear relationships between input state and output value using arbitrary kernels like _radial basis functions_ as our feature transformation. 
+
+In this model, our output value is still linear with respect to the features. **What if our underlying value function was truly non-linear with respect to a combination of these feature values?**
+
+<p align="center">
+<img src="img/kernel2.png" alt="drawing" width="500"/>
+</p>
+
+To capture such complex relationships, let's pass our linear response obtained using the dot product through some nonlinear function ![](https://latex.codecogs.com/gif.latex?f). **Does this look familiar?**
+
+<p align="center">
+<img src="img/kernel3.png" alt="drawing" width="500"/>
+</p>
+
+**Yes, it is the basis of _artificial neural networks_.** Such a non-linear function is generally called an _activation function_ and immensely increase the representational capacity of our approximator. 
+
+We can iteratively update the parameters of any such function using _gradient descent_. 
+
+<p align="center">
+<img src="img/kernel4.png" alt="drawing" width="500"/>
+</p>
+
+See the video [here](https://youtu.be/rITnmpD2mN8).
+
+# Summary
+Traditional RL techniques use a finite MDP to model an environment which limits us to environments with discrete state and action and spaces. 
+
+In order to extend our learning algorithms to continuous spaces, we can do one of two things: 
+
+- Discretize the state space
+- Directly trying to approximate desired value functions.
+
+Discertization can be performed using a constant grid, tile coding, or course coding. This indirectly leads to an approximation of the value function. 
+
+Directly approximating a continuous value function can be done by first defining a feature transformation and then computing a linear combination of those features. 
+
+Using non-linear feature transforms like radial basis functions, allows us to use the same linear combination framework to capture some non-linear relationships. 
+
+In order to represent non-linear relationships across combinations of features, we can apply an activation function. This sets us up to use **deep neural networks** for RL. 
+
+See the video [here](https://youtu.be/MTEBk43oByU).
 
