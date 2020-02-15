@@ -90,5 +90,42 @@ In order to overcome these challenges, the researchers came up with several tech
 
 See the video [here](https://youtu.be/GgtR_d1OB-M).
 
+# Experience Replay
+The idea of experience replay and its application to training neural networks for RL isn't new. It was originally proposed to make more efficient use of observed experiences. Consider the basic online Q-learning algorithm where we interact with the environment and at each time step, we obtain a tuple like this: ![](https://latex.codecogs.com/gif.latex?%5Cleft%20%5Clangle%20S_t%2C%20A_t%2C%20R_%7Bt&plus;1%7D%2C%20S_%7Bt&plus;1%7D%20%5Cright%20%5Crangle), learn from it and then discarded, moving on to the next tuple in the following timestep. 
+
+This seems a little wasteful. We could possibly learn more from these experienced tuples if we stored them somewhere. 
+
+Moreover, some states are pretty rare to come by and some actions can be pretty costly. So, it'd be nice to recall such experiences. 
+
+That is exactly what a **replay buffer** allows us to do. We store each experienced tuple in this buffer as we are interacting with the environment and then sample a small batch of tuples from it in order to learn. 
+
+As a result, we are able to learn from individual tuples multiple times, recall rare occurences, and in general make better use of our experience. 
+
+But there is another critical problem that experience replay can help with and this is what DQN takes advantage of. If you think about the experiences being obtained, you realize that every action ![](https://latex.codecogs.com/gif.latex?A_t) affects the next state ![](https://latex.codecogs.com/gif.latex?S_t) in some way, which means that a sequence of experienced tuples can be highly correlated. 
+
+A naive Q-learning approach that learns from each of these experiences in sequential order runs the risk of getting swayed by the effects of this correlation. 
+
+With **experience replay**, we can sample from this buffer at random. It doesn't have to be in the same sequence as we stored the tuples. This helps break the correlation and ultimately prevents action values from oscillating or diverging catastrophically. 
+
+Let's look at an example for better understanding ([this video](https://youtu.be/wX_-SZG-YMQ) from minute 2:00).
+
+If you think about it, this approach is basically building a database of samples and then learning a mapping from them. In that sense, **experience replay helps us reduce the RL problem or at least the value learning portion of it to a supervised learning scenario**. We can then apply other models learning techniques and best practices developed in the supervised learning literature through the RL. We can even improve upon this idea, for example, by prioritizing experience tuples that are rare or more important. 
+
+See the video [here](https://youtu.be/wX_-SZG-YMQ).
+
+## Summary
+When the agent interacts with the environment, the sequence of experience tuples can be highly correlated. The naive Q-learning algorithm that learns from each of these experience tuples in sequential order runs the risk of getting swayed by the effects of this correlation. By instead keeping track of a  **replay buffer**  and using  **experience replay**  to sample from the buffer at random, we can prevent action values from oscillating or diverging catastrophically.
+
+The  **replay buffer**  contains a collection of experience tuples ![](https://latex.codecogs.com/gif.latex?%28S%2C%20A%2C%20R%2C%20%7BS%7D%27%29). The tuples are gradually added to the buffer as we are interacting with the environment.
+
+The act of sampling a small batch of tuples from the replay buffer in order to learn is known as  **experience replay**. In addition to breaking harmful correlations, experience replay allows us to learn more from individual tuples multiple times, recall rare occurrences, and in general make better use of our experience.
+
+
+
+
+
+
+
+
 
 
