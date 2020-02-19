@@ -322,8 +322,92 @@ You can read more about Double DQN (DDQN) by perusing this  [research paper](htt
 
 If you'd like to dig deeper into how Deep Q-Learning overestimates action values, please read this  [research paper](https://www.ri.cmu.edu/pub_files/pub1/thrun_sebastian_1993_1/thrun_sebastian_1993_1.pdf).
 
+# Prioritized Experience Replay
+The next issue we'll look at is related to experience replay. Recall the basic idea behind it. We interact with the environment to collect experience tuples, save them in a buffer, and then later, we randomly sample a batch to learn from. This helps us break the correlation between consecutive experiences and stabilizes our learning algorithm. 
 
+But some of these experiences may be more important for learning than others. Moreover, these important experiences might occur infrequently. If we sample the batches uniformly, then these experiences have a very small chance of getting selected. 
 
+Since buffers are practically limited in capacity, older important experiences may get lost. This is where the idea of **prioritized experience replay** comes in. **But what criteria should we use to assign priorities to each tuple?**
+
+One approach is to use the _**TD error delta**_: _the bigger the error, the more we expect to learn from that tuple._ So, let's take the magnitude of this error as a measure of priority and store it along with each corresponding tuple in the replay buffer. 
+
+When creating batches, we can use this value to compute a sampling probability. Select any tuple ![](https://latex.codecogs.com/gif.latex?i) with a probability equal to its priority value ![](https://latex.codecogs.com/gif.latex?P%28i%29), normilized by the sum of all priority values in the replay buffer.
+
+<p align="center">
+<img src="img/per1.png" alt="drawing" width="500"/>
+</p>
+
+When a tuple is picked, we can update its priority with a newly computed TD error using the latest ![](https://latex.codecogs.com/gif.latex?q) values. This seems to work fairly well and has been shown to reduce the number of batch updates needed to learn a value function. 
+
+There are couple of things we can improve. 
+
+- First, note that if the TD error is zero, then the priority value of the tuple and hence its probability of being picked will also be zero. Zero or very low TD error doesn't necessarily mean we have nothing more to learn from such a tuple, it might be the case that our estimate was closed due to the limited samples we visited till that point. So, to prevent such tuples from being starved for selection, we can add a small constant ![](https://latex.codecogs.com/gif.latex?e) to every priority value. 
+
+- Another issue along similar line is that greedily using these priority values may lead to a small subset of experiences being replayed over and over resulting in a overfitting to that subset. To avoid this, we can reintroduce some element of uniform random sampling. This adds another hyperparameter ![](https://latex.codecogs.com/gif.latex?A) which we use to redefine the sampling probability as ![](https://latex.codecogs.com/gif.latex?P%28i%29%3D%5Cfrac%7Bp_%7Bi%7D%5E%7Ba%7D%7D%7B%5Csum%20p_%7Bk%7D%5E%7Ba%7D%7D). We can control how much we want to use priorities versus randomness by varying this parameter, where ![](https://latex.codecogs.com/gif.latex?a%3D0) corresponds to pure uniform randomness and ![](https://latex.codecogs.com/gif.latex?a%3D1) only uses priorities. 
+
+- When we use prioritized experience replay, we have ot make one adjustment to our update rule. Remember that our original Q-learning update is derived from an experience over all experiences. When using a stochastic update rule, the way we sample these experiences must match the underlying distribution they came from. This is preserved when we sample experience tuples uniformly from the replay buffer, but this assumption is violated when we use a non-uniform sampling, for example, using priorities. The Q values we learn will be biased according to these priority values which we only wanted to use for sampling. _**To correct for this bias**_, we need to introduce an importance-sampling weight equal to ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cfrac%7B1%7D%7BN%7D%5Cfrac%7B1%7D%7BP%28i%29%7D), where ![](https://latex.codecogs.com/gif.latex?N) is the size of this replay buffer. We can add another hyperparameter ![](https://latex.codecogs.com/gif.latex?b) and raise each importance-sampling weight to ![](https://latex.codecogs.com/gif.latex?b), to control how much these weights affect learning. In fact, these weights are more important toward the end of learning when your Q values begin to converge. So, you can increase ![](https://latex.codecogs.com/gif.latex?b) from a low value to 1 over time. 
+
+<p align="center">
+<img src="img/per2.png" alt="drawing" width="600"/>
+</p>
+
+See the video [here](https://youtu.be/cN8z-7Ze9L8).
+
+**NOTE:** You can read more about prioritized experience replay by perusing this [research paper](https://arxiv.org/abs/1511.05952).
+
+# Dueling DQN
+The final enhancement of DQNs that we will briefly look at is appropriately titled **Dueling Networks.** Below is a typical DQN architecture. A sequence of convolutional layers followed by a couple of fully connected layers that produce Q values. The **core idea** of dueling networks is to use two streams, one that estimates the state value function, and one that estimates the advantage for each action. 
+
+<p align="center">
+<img src="img/duel1.png" alt="drawing" width="600"/>
+</p>
+
+These streams may share some layers in the beginning such as convolutional layers, then branch off with their own fully-connected layers. Finally, the desired Q values are obtained by combining the state and advantage values. The intuition behind this is that the value of most states don't vary a lot across actions. So, it makes sense to try and directly estimate them, but we still need to capture the difference actions make in each state. 
+
+This is where the advantage function comes in. Some modifications are necessary to adapt Q learning to this architecture, which you can find in the dueling network's paper. Along with double DQN and prioritized replay, this technique has resulted in significant improvement over vanilla DQNs. 
+
+See the video [here](https://youtu.be/zZeHbPs39Ls).
+
+**NOTE:** You can read more about Dueling DQN by perusing this [research paper](https://arxiv.org/abs/1511.06581).
+
+# Rainbow
+
+So far, you've learned about three extensions to the Deep Q-Networks (DQN) algorithm:
+
+-   Double DQN (DDQN)
+-   Prioritized experience replay
+-   Dueling DQN
+
+But these aren't the only extensions to the DQN algorithm! Many more extensions have been proposed, including:
+
+-   Learning from  [multi-step bootstrap targets](https://arxiv.org/abs/1602.01783)  (as in A3C -  _you'll learn about this in the next part of the nanodegree_)
+-   [Distributional DQN](https://arxiv.org/abs/1707.06887)
+-   [Noisy DQN](https://arxiv.org/abs/1706.10295)
+
+Each of the six extensions address a  **_different_**  issue with the original DQN algorithm.
+
+Researchers at Google DeepMind recently tested the performance of an agent that incorporated all six of these modifications. The corresponding algorithm was termed  [Rainbow](https://arxiv.org/abs/1710.02298).
+
+It outperforms each of the individual modifications and achieves state-of-the-art performance on Atari 2600 games!
+
+<p align="center">
+<img src="img/rainbow.png" alt="drawing" width="500"/>
+</p>
+
+## In Practice
+In mid-2018, OpenAI held  [a contest](https://contest.openai.com/), where participants were tasked to create an algorithm that could learn to play the  [Sonic the Hedgehog](https://en.wikipedia.org/wiki/Sonic_the_Hedgehog)  game. The participants were tasked to train their RL algorithms on provided game levels; then, the trained agents were ranked according to their performance on previously unseen levels.
+
+Thus, the contest was designed to assess the ability of trained RL agents to generalize to new tasks.
+
+<p align="center">
+<img src="img/sonic.gif" alt="drawing" width="500"/>
+</p>
+
+One of the provided baseline algorithms was **Rainbow DQN**. If you'd like to play with this dataset and run the baseline algorithms, you're encouraged to follow the [setup instructions](https://contest.openai.com/2018-1/details/).
+
+<p align="center">
+<img src="img/rainbow2.png" alt="drawing" width="600"/>
+</p>
 
 
 
