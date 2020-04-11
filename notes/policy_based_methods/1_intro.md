@@ -155,3 +155,53 @@ Note, however, that it's  **_not_**  guaranteed to always yield the weights of t
 ## Additional Note
 Note that  [hill climbing](https://en.wikipedia.org/wiki/Hill_climbing)  is not just for reinforcement learning! It is a general optimization method that is used to find the maximum of a function.
 
+# Hill Climbing Pseudocode
+Now that we have a mental picture of how the hill climbing algorithm should work, we're ready to dig into the pseudocode. 
+
+- We begin with an initially random set of weights ![](https://latex.codecogs.com/png.latex?%5Ctheta). 
+- We'll collect an episode with the policy that correspond to those weights, and then record the return ![](https://latex.codecogs.com/png.latex?G).
+- At the start, this value ![](https://latex.codecogs.com/png.latex?%5Ctheta) is our first best guess for the weights, which we'll record as ![](https://latex.codecogs.com/png.latex?%5Ctheta_%7Bbest%7D). We'll also record the return as the highest return we've gotten so far, ![](https://latex.codecogs.com/png.latex?G_%7Bbest%7D).
+- Then, we add a little bit of random noise to these weights to give us another set of candidate weights we can try out. Let's call them ![](https://latex.codecogs.com/png.latex?%5Ctheta_%7Bnew%7D). 
+- To see how good those new weights are, we'll use the policy that they give us to interact with the environment, then we calculate the return we got which we refer to as![](https://latex.codecogs.com/png.latex?G_%7Bnew%7D).  
+- If the new weights give us more return than our current best estimate ,![](https://latex.codecogs.com/png.latex?G_%7Bnew%7D%20%3E%20G_%7Bbest%7D), we update the best weights to that new value, ![](https://latex.codecogs.com/png.latex?%5Ctheta_%7Bbest%7D%20%5Cleftarrow%20%5Ctheta_%7Bnew%7D).
+- Then, we just repeat these steps until we solve the environment. That's it!
+
+See the video [here](https://youtu.be/0XzzqIXyax0).
+
+<p align="center">
+<img src="img/hill3.png" alt="drawing" width="600"/>
+</p>
+
+## What's the difference between _G_ and _J_?
+You might be wondering: what's the difference between the return that the agent collects in a single episode (![](https://latex.codecogs.com/png.latex?G),  _from the pseudocode above_) and the expected return ![](https://latex.codecogs.com/png.latex?J)?
+
+Well ... in reinforcement learning, the goal of the agent is to find the value of the policy network weights ![](https://latex.codecogs.com/png.latex?%5Ctheta) that maximizes **_expected_** return, which we have denoted by ![](https://latex.codecogs.com/png.latex?J).
+
+In the hill climbing algorithm, the values of ![](https://latex.codecogs.com/png.latex?%5Ctheta) are evaluated according to how much return ![](https://latex.codecogs.com/png.latex?G) they collected in a **_single episode_**. To see that this might be a little bit strange, note that due to randomness in the environment (and the policy, if it is stochastic), it is highly likely that if we collect a second episode with the same values for ![](https://latex.codecogs.com/png.latex?%5Ctheta), we'll likely get a different value for the return ![](https://latex.codecogs.com/png.latex?G). Because of this, the (sampled) return ![](https://latex.codecogs.com/png.latex?G) is not a perfect estimate for the expected return ![](https://latex.codecogs.com/png.latex?J), but it often turns out to be **_good enough_** in practice.
+
+# Beyond Hill Climbing
+
+In the previous section, you learned about the hill climbing algorithm.
+
+We denoted the expected return by ![](https://latex.codecogs.com/png.latex?J). Likewise, we used ![](https://latex.codecogs.com/png.latex?%5Ctheta) to refer to the weights in the policy network. Then, since ![](https://latex.codecogs.com/png.latex?%5Ctheta) encodes the policy, which influences how much reward the agent will likely receive, we know that ![](https://latex.codecogs.com/png.latex?J) is a function of ![](https://latex.codecogs.com/png.latex?%5Ctheta).
+
+Despite the fact that we have no idea what that function ![](https://latex.codecogs.com/png.latex?J%20%3D%20J%28%5Ctheta%29) looks like, the _hill climbing_ algorithm helps us determine the value of ![](https://latex.codecogs.com/png.latex?%5Ctheta) that maximizes it. Watch the video below to learn about some improvements you can make to the hill climbing algorithm!
+
+**Note:** We refer to the general class of approaches that find ![](https://latex.codecogs.com/png.latex?%5Ctextup%7Bargmax%7D_%7B%5Ctheta%7D%20J%28%5Ctheta%29) through randomly perturbing the most recent best estimate as **stochastic policy search**. Likewise, we can refer to ![](https://latex.codecogs.com/png.latex?J) as an  **objective function**, which just refers to the fact that we'd like to _maximize_ it!
+
+With an objective function in hand, we can now think about finding a policy that maximizes it. An objective function can be quite complex. Think of it as a surface with many peaks and valleys. 
+
+Here, it's a function of two parameters with the height indicating the policy's objective value ![](https://latex.codecogs.com/png.latex?J%28%5Ctheta%29). But the same idea extends to more than two parameters. 
+
+Now, we don't know anything about this surface. So, **how do we find the spot where the objective value is at its maximum?** 
+
+Our first approach is to search for the best policy by repeatedly nudging it around. Let's start with some arbitrary policy ![](https://latex.codecogs.com/png.latex?%5Cpi), defined by its parameters ![](https://latex.codecogs.com/png.latex?%5Ctheta), and evaluate it by applying that policy in the environment. This gives us an objective value. So you can imagine the policy lying somewhere on the objective function surface. 
+
+Now, we can change the policy parameters slightly so that the objective value also changes. This can be achieved by adding some small **Guassian noise** to the parameters. 
+
+If the new policies value is better than our best value so far, we can set this policy to be our bew best policy and iterate. 
+
+This general approach is known as **hill climbing**. You literally walk the objective function surface till you reach the top of a hill. 
+
+_**The best part is that you can use any policy function. It does not need to be differentiable or even continuous, but because you're taking random steps, this may not result in the most eficient path up the hill.**_
+
