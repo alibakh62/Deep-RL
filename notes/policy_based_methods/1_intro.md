@@ -251,5 +251,165 @@ That said, it's best to think of evolution strategies as just another black-box 
 
 See the video [here](https://youtu.be/2poDljPvY58).
 
+# Coding Exercise
+In the following, you will explore implementations of two different policy-based methods.
+
+- [Hill Climbing](codes/hill-climbing/Hill_Climbing.ipynb)
+- [Cross Entropy](codes/cross-entropy/CEM.ipynb)
+
+# OpenAI Request for Research
+
+So far in this lesson, you have learned about many black-box optimization techniques for finding the optimal policy. Run each algorithm for many random seeds, to test stability.
+
+Take the time now to implement some of them, and compare performance on OpenAI Gym's  `CartPole-v0`  environment.
+
+> **Note**: This suggested exercise is completely optional.
+
+Once you have completed your analysis, you're encouraged to write up your own blog post that responds to  [OpenAI's Request for Research](https://openai.com/requests-for-research/#cartpole)! (_This request references policy gradient methods. You'll learn about policy gradient methods in the next lesson._)
+
+<p align="center">
+<img src="img/cartpole.gif" alt="drawing" width="400"/>
+</p>
+
+Implement (vanilla) hill climbing and steepest ascent hill climbing, both with simulated annealing and adaptive noise scaling.
+
+If you also want to compare the performance to evolution strategies, you can find a well-written implementation  [here](https://github.com/alirezamika/evostra). To see how to apply it to an OpenAI Gym task, check out  [this repository](https://github.com/alirezamika/bipedal-es).
+
+To see one way to structure your analysis, check out  [this blog post](http://kvfrans.com/simple-algoritms-for-solving-cartpole/), along with the  [accompanying code](https://github.com/kvfrans/openai-cartpole).
+
+For instance, you will likely find that hill climbing is very unstable, where the number of episodes that it takes to solve  `CartPole-v0`  varies greatly with the random seed. (_Check out the figure below!_)
+
+<p align="center">
+<img src="img/cartpole2.png" alt="drawing" width="500"/>
+</p>
+
+# Why Policy-Based Methods?
+
+In this lesson, you've learned about several policy-based methods. But why do we need policy-based methods at all, when value-based methods work so well?
+
+You may be wondering why do we need to find optimal policies directly when value-based methods seem to work so well.
+
+There are three arguments we'll consider: 
+
+- Simplicity
+- Stochastic Policies
+- Continuous Action Spaces
+
+### Simplicity
+
+Remember that in value-based methods like Q-learning, we invented this idea of a value function as an intermediate step towards finding the optimal policy. It helps us rephrase the problem in terms of something that is easier to understand and learn.
+
+<p align="center">
+<img src="img/why1.png" alt="drawing" width="500"/>
+</p>
+
+### Stochastic Policies
+
+**But if our ultimate goal is to find that optimal policy, do we really need this value function? Can we directly estimate the optimal policy? What would such a policy look like?** 
+
+If we go with a deterministic approach, then the policy simply needs to be a mapping or function from states to actions. And in the stochastic case, this would be the conditional probability of each action given a certain state. 
+
+<p align="center">
+<img src="img/why2.png" alt="drawing" width="300"/>
+</p>
+
+We would then choose an action based on this probability distribution. This is simpler in the sense that we are directly getting to the problem at hand, but it also avoids having to store a bunch of additional data that may or may not always be useful. 
+
+For example, large portions of the state space may have the same value. Formulating the policy in this manner allows us to make such generalizations where possible and focus more the complicated regions of the state space. 
+
+**One of the main advantages of policy-based methods over value-based methods is** that they can learn true stochastic policies. This is like picking a random number from a special kind of machine. One where the chances of each number being selected depends on some state variables that can be changed. 
+
+In contrast, when we apply _**epsilon-greedy action selection**_ to a value function, that does add some randomness, but it's a hack. Flip a coin, if it's heads follow a deterministic policy, hence pick an action at random. The underlying value function can still drive us towards certain actions more than others. Let's see how this can be problematic.
+
+Say you're learning to play rock paper scissors. Your opponent reveals their move at the same time as you. So you can't really use that to decide what to pick. In fact, it turns out that the optimal policy here is to choose an action uniformly at random. Anything else, like a deterministic policy or even a stochastic policy with some non-uniformity can be exploited by the opponent. 
+
+**Aliased States:**
+
+Another situation where the stochastic policy helps is when we have **aliased states**, that is, two or more states that we perceive to be identical but are actually different. In this sense, their environment is partially observable, but such situations can arise more often than you think. Consider this grid world for instance, which consists of smooth white and rough gray cells, and there is banana in the bottom middle cell and a chili each in the bottom left and right corners. Obviously, agent George needs to find a reliable policy to get to the banana and avoid landing on the chilies no matter what cell he starts in.
+
+<p align="center">
+<img src="img/why3.png" alt="drawing" width="400"/>
+</p>
+
+But here's is the catch, all he can sense is whether the current cell is smooth or rough and whether it has a wall on each side. Think of these as the only observations or features that are available from the environment. He can't sense anything about neighboring cells either. 
+
+When George is in the top middle cell, he can sense it's smooth and only has a single wall to the north. So, he can relialbly take a step downwards and reach the banana. When he is in either of the top left or right cells, he can sense the side walls, so, he can recognize which of the two extreme cells he is in and can learn to reliably step away from the chilies and toward the center. 
+
+The trouble is, when he's in one the rough gray cells, he can't tell which one he's in. All the features are identical. If he's using a _value function representation_, then the value of these cells is equal, since they both map to the same state and the corresponding best action must also be identical. So, depending on his experiences, George might learn to either go right or left from both these cells, resulting in an overall policy like the picture below, whic is fine, expect for that orange region. George will keep oscillating between these two cells and never get out. 
+
+<p align="center">
+<img src="img/why4.png" alt="drawing" width="400"/>
+</p>
+
+With a small epsilon-greedy policy, George might be able to come out by chance, but that's very inefficient and could take indefinitely long. And if he kept a high epsilon, that might result in bad actions in other states. 
+
+We can clearly see that the other value-based policy would not be ideal either. 
+
+The best he can do is to assign equal probability to moving left or right from these aliased states. He's much more likely to get out of the traps soon. 
+
+**A value-based approach tends to learn a deterministic or near deterministic policy, whereas a policy-based approach in this situation can learn the desired stochastic policy.**
+
+### Continuous Action Spaces
+Our final reason for exploring policy-based methods, is that **they are well-suited for continuous action spaces**. 
+
+When we use a value-based method even with a function approximator, our output consists of a value for each action. Now, if the action space is discrete, and there are a finite number of actions, we can easily pick the action with the maximum value. 
+
+But, if the action space is continuous, then this max operation turns into an optimization problem itself. 
+
+It's like trying to find a global maximum of a continuous function which is non-trivial, especially if the function is not convex. 
+
+**A similar issue exists in higher dimensional action spaces, lots of possible actions to evaluate. It would be nice if we could map a given state to an action directly. Even if the resulting policy is a bit more complex, it would significantly reduce the computation time needed to act, and that's something a policy-based method can enable**. 
+
+See the video [here](https://youtu.be/ToS8vXGdODE).
+
+# Summary
+
+<p align="center">
+<img src="img/why5.png" alt="drawing" width="400"/>
+</p>
+
+### Policy-Based Methods
+
+-   With  **value-based methods**, the agent uses its experience with the environment to maintain an estimate of the optimal action-value function. The optimal policy is then obtained from the optimal action-value function estimate.
+-   **Policy-based methods**  directly learn the optimal policy, without having to maintain a separate value function estimate.
+
+### Policy Function Approximation
+
+-   In deep reinforcement learning, it is common to represent the policy with a neural network.
+    -   This network takes the environment state as  **_input_**.
+    -   If the environment has discrete actions, the  **_output_**  layer has a node for each possible action and contains the probability that the agent should select each possible action.
+-   The weights in this neural network are initially set to random values. Then, the agent updates the weights as it interacts with (_and learns more about_) the environment.
+
+### More on the Policy
+
+-   Policy-based methods can learn either stochastic or deterministic policies, and they can be used to solve environments with either finite or continuous action spaces.
+
+### Hill Climbing
+
+-   **Hill climbing**  is an iterative algorithm that can be used to find the weights ![](https://latex.codecogs.com/png.latex?%5Ctheta) -   for an optimal policy.
+-   At each iteration,
+    -   We slightly perturb the values of the current best estimate for the weights ![](https://latex.codecogs.com/png.latex?%5Ctheta_%7Bbest%7D), -   to yield a new set of weights.
+-   These new weights are then used to collect an episode. If the new weights ![](https://latex.codecogs.com/png.latex?%5Ctheta_%7Bnew%7D) resulted in higher return than the old weights, then we set ![](https://latex.codecogs.com/png.latex?%5Ctheta_%7Bbest%7D%20%5Cleftarrow%20%5Ctheta_%7Bnew%7D).
+
+### Beyond Hill Climbing
+
+-   **Steepest ascent hill climbing**  is a variation of hill climbing that chooses a small number of neighboring policies at each iteration and chooses the best among them.
+-   **Simulated annealing**  uses a pre-defined schedule to control how the policy space is explored, and gradually reduces the search radius as we get closer to the optimal solution.
+-   **Adaptive noise scaling**  decreases the search radius with each iteration when a new best policy is found, and otherwise increases the search radius.
+
+### More Black-Box Optimization
+
+-   The  **cross-entropy method**  iteratively suggests a small number of neighboring policies, and uses a small percentage of the best performing policies to calculate a new estimate.
+-   The  **evolution strategies**  technique considers the return corresponding to each candidate policy. The policy estimate at the next iteration is a weighted sum of all of the candidate policies, where policies that got higher return are given higher weight.
+
+### Why Policy-Based Methods?
+
+-   There are three reasons why we consider policy-based methods:
+    1.  **Simplicity**: Policy-based methods directly get to the problem at hand (estimating the optimal policy), without having to store a bunch of additional data (i.e., the action values) that may not be useful.
+    2.  **Stochastic policies**: Unlike value-based methods, policy-based methods can learn true stochastic policies.
+    3.  **Continuous action spaces**: Policy-based methods are well-suited for continuous action spaces.
+
+
+
 
 
