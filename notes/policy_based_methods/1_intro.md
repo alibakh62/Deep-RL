@@ -205,3 +205,51 @@ This general approach is known as **hill climbing**. You literally walk the obje
 
 _**The best part is that you can use any policy function. It does not need to be differentiable or even continuous, but because you're taking random steps, this may not result in the most eficient path up the hill.**_
 
+One small improvement to this approach is to choose a small number of neighboring policies at each iteration and pick the best among them. 
+
+It's easier to understand this by looking at a contour plot. Again, starting with an arbitrary policy, evaluate it to find out where it lies. Generate a few candidate policies by perturbing the parameters randomly and evaluate each policy by interacting with the environment. This gives us an idea of the neighborhood of the current policy. 
+
+Now, pick the candidate policy that looks most promising and iterate. This variation is known as **steepest ascent hill climbing** and it helps reduce the risk of selecting a next policy that may lead to a suboptimal solution. 
+
+<p align="center">
+<img src="img/hill4.png" alt="drawing" width="600"/>
+</p>
+
+You could still get stuck in local optima. But there are some modifications that can help mitigate that, for example, by using random restarts or **simulated annealing**. 
+
+**Simulated annealing** uses a predefined schedule to control how the policy space is explored. Starting with a large noise parameter, that is a broad neighborhood to explore, we gradually reduce the noise or radius as we get closer to the optimal solution. This is somewhat like annealing an iron by heating it up and then letting it cool down gradually. It allows iron molecules to settle into an optimal arrangement resulting in a hardened metal, hence the name. 
+
+We can also make our approach more adaptive to the changes in policy values being observed. Here's the intuition. 
+
+**Adaptive Noise Scaling:**
+
+Whenever we find a better policy than before, we're likely getting closer to the optimal policy. So, it makes sense to reduce our search radius for generating the next policy. This translates to reducing or decaying the variance of the Gaussian noise we add. So far, it's just like simulated annealing. But, if we don't find a better policy it's probably a good idea to increase our search radius and continue exploring from the current best policy. This small tweak to stochastic policy search makes it much less likely to get stuck, especially in domains with a complicated objective function. 
+
+See the video [here](https://youtu.be/QicxmyE5vTo).
+
+# More Black-Box Optimization
+
+All of the algorithms that you’ve learned about in this lesson can be classified as  **black-box optimization**  techniques.
+
+**Black-box**  refers to the fact that in order to find the value of ![](https://latex.codecogs.com/png.latex?%5Ctheta) that maximizes the function ![](https://latex.codecogs.com/png.latex?J%20%3D%20J%28%5Ctheta%29), we need only be able to estimate the value of ![](https://latex.codecogs.com/png.latex?J) at any potential value of ![](https://latex.codecogs.com/png.latex?%5Ctheta).
+
+That is, both hill climbing and steepest ascent hill climbing don't know that we're solving a reinforcement learning problem, and they do not care that the function we're trying to maximize corresponds to the expected return.
+
+These algorithms only know that for each value of ![](https://latex.codecogs.com/png.latex?%5Ctheta), there's a corresponding **_number_**. We know that this **_number_** corresponds to the return obtained by using the policy corresponding to ![](https://latex.codecogs.com/png.latex?%5Ctheta) to collect an episode, but the algorithms are not aware of this. To the algorithms, the way we evaluate ![](https://latex.codecogs.com/png.latex?%5Ctheta) is considered a black box, and they don't worry about the details. The algorithms only care about finding the value of ![](https://latex.codecogs.com/png.latex?%5Ctheta) that will maximize the number that comes out of the black box.
+
+In the video below, you'll learn about a couple more black-box optimization techniques, to include the  **cross-entropy method**  and  **[evolution strategies](https://blog.openai.com/evolution-strategies/)**.
+
+So far, you've learned about a couple of different algorithms that we can use to optimize the weights of the policy networks. 
+
+Hill climbing begins with a best guess for the weights, then it adds a little bit of noise to propose one new policy that might perform better. Steepst ascent hill climbing does a little bit more work by generating several neighboring policies at eac iteration. But, in both cases, only the best policy prevails. For steepest ascent hill climbing there's a lot of useful information that we're throwing out. 
+
+Here, we're going to learn about some methods that leverage useful information from the weights that aren't selected as best. So what if instead of selecting only the best policy, we select the top 10 or 20 percent of them, and took the average? This is what the **Cross Entropy Method** does.
+
+Another approach is to look at the return that was collected by each candidate policy. The best policy will be a weighted sum of all of these, where policies that got higher return are given more say or get a higher weight. This technique is called **Evolution Strategies**. The name originally comes from the idea of biological evolution, where the idea is that the most successful individuals in the policy population, who have the most influence on the next generation or iteration. 
+
+That said, it's best to think of evolution strategies as just another black-box optimization technique. 
+
+See the video [here](https://youtu.be/2poDljPvY58).
+
+
+
