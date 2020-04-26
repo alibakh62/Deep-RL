@@ -86,3 +86,176 @@ To further explore the connections between policy gradient methods and supervise
 
 Learn more about the connections between supervised learning and reinforcement learning. ([Source](http://karpathy.github.io/2016/05/31/rl/))
 
+# Problem Setup
+
+We're now ready to get started with rigorously defining how policy gradient methods will work. Now that we have the big picture of how the policy gradient method will work, we're ready to get more specific.
+
+We'll build slowly and carefully, and I strongly encourage you to keep the big picture in mind as the mathematical details unfold.
+
+The first thing we need to define is a Trajectory. A **Trajectory** is just a state action sequence. You can start to think of it as just a fancy way of referring to an episode where we don't keep track of the rewards. But actually, a Trajectory is a little bit more flexible because there are no restrictions on its length. So, it can correspond to a full episode or just a small part of an episode.
+
+We denote the length with a capital ![](https://latex.codecogs.com/png.latex?H), where ![](https://latex.codecogs.com/png.latex?H) stands for Horizon. We denote a Trajectory with ![](https://latex.codecogs.com/png.latex?%5Ctau).
+Then, the sum reward from that Trajectory is written as ![](https://latex.codecogs.com/png.latex?R%28%5Ctau%29). 
+
+<p align="center">
+<img src="img/policygrad4.png" alt="drawing" width="500"/>
+</p>
+
+Our **goal** in this lesson is the same as in the previous lesson. **We want to find the weights ![](https://latex.codecogs.com/png.latex?%5Ctheta) of the neural network that maximize expected return**.
+
+One way of accomplishing this is by setting the weights of the neural network so that on average, the agent experiences trajectories that yield high return. We denote the expected return by ![](https://latex.codecogs.com/png.latex?U), and note that ![](https://latex.codecogs.com/png.latex?U) is a function of ![](https://latex.codecogs.com/png.latex?%5Ctheta). We want to find the value for ![](https://latex.codecogs.com/png.latex?%5Ctheta) that maximizes ![](https://latex.codecogs.com/png.latex?U). ![](https://latex.codecogs.com/png.latex?U) is defined in the expression below.
+
+<p align="center">
+<img src="img/policygrad5.png" alt="drawing" width="600"/>
+</p>
+
+To understand it, we'll look at each part separately.
+
+- First, recall that this ![](https://latex.codecogs.com/png.latex?R%28%5Ctau%29) is just the return corresponding to an arbitrary Trajectory tab.
+- So then, to take this quantity and use it to calculate the expected return,
+we need only take into account the probability of each possible trajectory.
+- That probability depends on the weights ![](https://latex.codecogs.com/png.latex?%5Ctheta) in the neural network. This is because ![](https://latex.codecogs.com/png.latex?%5Ctheta) defines the policy which is used to select the actions in the trajectory, which also in turn plays a role in determining the states that the agent sees.
+- We use this notation with a semicolon only to indicate that ![](https://latex.codecogs.com/png.latex?%5Ctheta) has this influence on the probability of a trajectory.
+- In the upcoming concepts, we work directly with this formula as we explore the details behind the policy gradients method.
+
+## Important Note
+
+Before moving on, make sure it's clear to you that the equation discussed in the video (and shown below) calculates an  [expectation](https://en.wikipedia.org/wiki/Expected_value).
+
+<p align="center">
+<img src="img/policygrad6.png" alt="drawing" width="250"/>
+</p>
+
+To see how it corresponds to the **expected return**, note that we've expressed the **return** ![](https://latex.codecogs.com/png.latex?R%28%5Ctau%29) as a function of the trajectory ![](https://latex.codecogs.com/png.latex?%5Ctau). Then, we calculate the weighted average (_where the weights are given by_ ![](https://latex.codecogs.com/png.latex?%5Cmathbb%7BP%7D%28%5Ctau%3B%5Ctheta%29)) of all possible values that the return ![](https://latex.codecogs.com/png.latex?R%28%5Ctau%29) can take.
+
+## Why Trajectories?
+
+You may be wondering:  _why are we using trajectories instead of episodes?_  The answer is that maximizing expected return over trajectories (instead of episodes) lets us search for optimal policies for both episodic  _and continuing_  tasks!
+
+That said, for many episodic tasks, it often makes sense to just use the full episode. In particular, for the case of the video game example described in the lessons, reward is only delivered at the end of the episode. In this case, in order to estimate the expected return, the trajectory should correspond to the full episode; otherwise, we don't have enough reward information to meaningfully estimate the expected return.
+
+# REINFORCE
+
+You've learned that our goal is to find the values of the weights ![](https://latex.codecogs.com/png.latex?%5Ctheta) in the neural network that maximize the expected return ![](https://latex.codecogs.com/png.latex?U)
+
+<p align="center">
+<img src="img/policygrad6.png" alt="drawing" width="250"/>
+</p>
+
+where ![](https://latex.codecogs.com/png.latex?%5Ctau) is an arbitrary trajectory. One way to determine the value of ![](https://latex.codecogs.com/png.latex?%5Ctheta) that maximizes this function is through  **gradient ascent**. This algorithm is closely related to  **gradient descent**, where the differences are that:
+
+-   gradient descent is designed to find the  **minimum**  of a function, whereas gradient ascent will find the  **maximum**, and
+-   gradient descent steps in the direction of the  **negative gradient**, whereas gradient ascent steps in the direction of the  **gradient**.
+
+Our update step for gradient ascent appears as follows:
+
+<p align="center">
+<img src="img/policygrad7.png" alt="drawing" width="200"/>
+</p>
+
+where ![](https://latex.codecogs.com/png.latex?%5Calpha) is the step size that is generally allowed to decay over time. Once we know how to calculate or estimate this gradient, we can repeatedly apply this update step, in the hopes that ![](https://latex.codecogs.com/png.latex?%5Ctheta) converges to the value that maximizes ![](https://latex.codecogs.com/png.latex?U%28%5Ctheta%29).
+
+For more complete explanation watch [this video](https://youtu.be/o6CI2q3IXEs).
+
+## Pseudocode
+
+The algorithm described in the video is known as  **REINFORCE**. The pseudocode is summarized below.
+
+1. Use the policy ![](https://latex.codecogs.com/png.latex?%5Cpi_%7B%5Ctheta%7D) to collect ![](https://latex.codecogs.com/png.latex?m) trajectories ![](https://latex.codecogs.com/png.latex?%5Cleft%20%5C%7B%20%5Ctau%5E%7B%281%29%7D%2C%20%5Ctau%5E%7B%282%29%7D%2C%20%5Ccdots%20%2C%20%5Ctau%5E%7B%28m%29%7D%20%5Cright%20%5C%7D) with horizon ![](https://latex.codecogs.com/png.latex?H). We refer to the ![](https://latex.codecogs.com/png.latex?i) -th trajectory as
+
+<p align="center">
+<img src="img/policygrad8.png" alt="drawing" width="350"/>
+</p>
+
+2. Use the trajectories to estimate the gradient ![](https://latex.codecogs.com/png.latex?%5Cnabla_%7B%5Ctheta%7D%20U%28%5Ctheta%29):
+
+<p align="center">
+<img src="img/policygrad9.png" alt="drawing" width="450"/>
+</p>
+
+3. Update the weights of the policy:
+
+<p align="center">
+<img src="img/policygrad10.png" alt="drawing" width="150"/>
+</p>
+
+4. Loop over steps 1-3.
+
+
+# (Optional) Derivation
+
+If you'd like to learn how to derive the equation that we use to approximate the gradient, please read the text below. Specifically, you'll learn how to derive
+
+<p align="center">
+<img src="img/policygrad9.png" alt="drawing" width="450"/>
+</p>
+
+## Likelihood Ratio Policy Gradient
+We'll begin by exploring how to calculate the gradient ![](https://latex.codecogs.com/png.latex?%5Cnabla_%7B%5Ctheta%7D%20U%28%5Ctheta%29). The calculation proceeds as follows:
+
+<p align="center">
+<img src="img/policygrad11.png" alt="drawing" width="450"/>
+</p>
+
+First, we note line (1) follows directly from 
+
+<p align="center">
+<img src="img/policygrad12.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/policygrad13.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/policygrad14.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/policygrad15.png" alt="drawing" width="750"/>
+</p>
+
+# Coding Exercise
+
+In this exercise, you will use an implementation of REINFORCE to solve OpenAI Gym's CartPole environment.
+
+**Note**: In the implementation, each trajectory corresponds to a full episode, and we collect  m=1  trajectories. You're strongly encouraged to refer to the pseudocode for REINFORCE while perusing the implementation.
+
+Later, you will learn about some modifications that you can use to improve this algorithm. You're strongly encouraged to implement these modifications, to get better performance!
+
+The code is [here](codes/REINFORCE.ipynb)
+
+# What's Next?
+
+In this lesson, you've learned all about the REINFORCE algorithm, which was illustrated with a toy environment with a  **_discrete_**  action space. But it's also important to mention that REINFORCE can also be used to solve environments with continuous action spaces!
+
+For an environment with a continuous action space, the corresponding policy network could have an output layer that parametrizes a  [continuous probability distribution](https://en.wikipedia.org/wiki/Probability_distribution#Continuous_probability_distribution).
+
+For instance, assume the output layer returns the mean ![](https://latex.codecogs.com/gif.latex?%5Cmu) and variance ![](https://latex.codecogs.com/gif.latex?%5Csigma%5E2) of a [normal distribution](https://en.wikipedia.org/wiki/Normal_distribution).
+
+<p align="center">
+<img src="img/policygrad16.png" alt="drawing" width="350"/>
+</p>
+
+<p align="center">
+<img src="img/policygrad17.png" alt="drawing" width="750"/>
+</p>
+
+# Summary
+
+<p align="center">
+<img src="img/policygrad18.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/policygrad19.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/policygrad20.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/policygrad21.png" alt="drawing" width="750"/>
+</p>
+
