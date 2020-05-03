@@ -97,3 +97,4 @@ Going back to the gradient estimate, we can take a closer look at the total rewa
 
 Now, let's think about what happens at time step t. Even before an action, ![](https://latex.codecogs.com/gif.latex?a_t), is decided, the agent has already received all the rewards up until time step ![](https://latex.codecogs.com/gif.latex?t-1).
 
+this is a test: <img src="https://latex.codecogs.com/gif.latex?a" title="a" /> and there is <img src="https://latex.codecogs.com/gif.latex?\alpha" title="\alpha" /> and it is.
