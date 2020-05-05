@@ -241,4 +241,30 @@ Now, if you want to learn more about agents who combine on- and off-policy learn
 
 See the video [here](https://youtu.be/AZiy5R0DESU).
 
+# A2C: Advantage Actor-Critic
+**You may be wondering what the asynchronous part in A3C is about?** 
+
+A3C accumulates gradient updates and applies those updates asynchronously to a global neural network. Each agent in simulation does this at its own time. So, the agents use a local copy of the network to collect experience, calculate, and accumulate gradient updates across multiple time steps, and then they apply these gradients to a global network asynchronously. 
+
+**Asynchronous** here means that each agent will update the network on its own. There is no synchronization between the agents. This also means that the weights an agent is using might be different from the weights in use by another agent at any given time. 
+
+There is a synchronous implementation of A3C called **Advantage Actor-Critic or A2C**. A2C has some extra bit of code that synchronizes all agents. It waits for all agents to finish a segment of interaction with its copy of the environment, and then updates the network at once, before sending the updated weights back to all agents. 
+
+A2C is arguably simpler to implement, yet it gives pretty much the same result, and allegedly in some cases performs even better. 
+
+A3C is most easily train on a CPU, while A2C is more straightforward to extend to a GPU implementation. 
+
+See the video [here](https://youtu.be/fIWe3xA97DA).
+
+# A2C Code Walk-through
+
+Check out the codes from Shangtong Zhang for an implementation in [his GitHub page](https://github.com/ShangtongZhang/DeepRL).
+
+For a walk-through of the A2C code, watch [this video](https://youtu.be/LiUBJje2N0c).
+
+**NOTE:** Zhang has also implemented all the Sutton's book codes in Python (I believe the original codes are in LISP). Check out his [Github repo](https://github.com/ShangtongZhang/reinforcement-learning-an-introduction) for those codes.
+
+# GAE: Generalized Advantage Estimation
+
+
 
