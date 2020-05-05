@@ -96,3 +96,82 @@ The argument you often hear as to why to call a neural network trained with Mont
 
 The important takeaway for you, though, is that there are inconsistencies out there. You often see methods named "Actor-Critic" when they are not. I just want to bring the issue to your attention.
 
+# Policy-based, Value-based and Actor-Critic
+Now that you have some foundational concepts down, let's talk about some intuition.
+
+Let's say you want to get better at tennis. The **actor or policy-based** approach you roughly learns this way. You play a bunch of matches. You then go home, lay on the couch, and commit to yourself to do more of what you did in matches you won, and less of what you did in matches you lost. After many many times repeating this process, you will have increased the probability of actions that led to a win, and decreased the probability of actions that led to losses. 
+
+But you can see how these approaches are rather **inefficient** as it needs lots of data to learn a useful policy. Many of the actions that occur within the game that ended up in a loss could have been really good actions. So, decreasing the probability of good actions taking in a match only because you lost is not the best idea.
+
+Sure, if you repeat this process infinitely, you're likely to end up with a good policy, but at the cost of slow learning. 
+
+It is clear that **policy-based agents have high variance.** The **critic or value-based** approach learns differently. 
+
+You start playing a match, and even before you get started, you start guessing what the final score is going to be like. You continue to make guesses throughout the match. At first, your guesses will be off. But as you get more and more experience, you will be able to make pretty solid guesses. The better your guesses, the better you'll tell good from bad actions. The better you can make these distinctions, the better you'll perform. Of course, given that you select good actions. 
+
+Though this is not a perfect approach either, **guesses introduce a bias** because they'll sometimes be wrong, particularly because of a lack of experience. **Guesses are prone to under or overestimation.** Though, guesses are more consistent through time. If you think you'll win a match five minutes into it, chances are you'll still think so 10 minutes into it. This is what makes the **TD estimate** have lower variance.
+
+_**As you can see, in a policy-based approach, the agent is learning to act, and it is good at that. Whereas in a value-based approach, the agent is learning to estimate situations and actions, and it's pretty good at that. Combining these two approaches sounds like a great idea, and it often yields better results.**_
+
+**Actor-critic agents** learn by playing games and adjusting the probabilities of good and bad actions just as with the actor alone. But this time, you'll also use a critic to be able to tell good from bad actions more quickly, and speed up learning. 
+
+In the end, **actor-critic agents** are moer stable than value-based agents, and need fewer samples than policy-based agents. 
+
+See the video [here](https://youtu.be/iyin896PNEc).
+
+# A Basic Actor-Critic Agent
+**You know now that an actor-critic agent is an agent that uses function approximation to learn a policy any value function. So, we will then use two neural networks; One for the actor and one for the critic.** 
+
+The **critic** will learn to evaluate the state value function `V_{\pi}` using TD estimate. Using the critic, we will calculate the advantage function and train the actor using this value. A very basic online actor-critic agent is as follows:
+
+_You have two networks. One network, the **actor**, takes in a state and outputs the distribution over actions. The other network, the **critic** takes in a state and outputs a state value function of policy `\pi`, `V({\pi})`._
+
+<p align="center">
+<img src="img/actor-critic3.png" alt="drawing" width="750"/>
+</p>
+
+The **algorithm** goes like this.
+
+Input the current state into the actor and get the action to take in that state. Onserve next state and reward to get your experience tuple `(s,a,r,s')`. 
+
+Then, using the TD estimate which is the reward `r` plus the critic's estimate for `s'`. So, `r + \gamma V(s';\theta_v)`. You train the critic. 
+
+Next, to calculate the advantage `A_{\pi}(s,a)` (equation in the picture above). We also use the critic. 
+
+Finally, we train the actor using the calculated advantage as a baseline. We'll focus on few of the most popular actor-critic agents in the next sections.
+
+See the video [here](https://youtu.be/KdHQ24hBKho).
+
+<p align="center">
+<img src="img/actor-critic4.png" alt="drawing" width="750"/>
+</p>
+
+# A3C: Asynchronous Advantage Actor-Critic, N-step Bootstrapping
+**A3C** stands for **Asynchronous Advantage Actor-Critic**. As you can probably infer from the name, we'll be calculating the advantage function, `A_{\pi}(s,a)`, and the critic will be learning to estimate `V_{\pi}` to help with that just as before. 
+
+If you're using images as inputs to your agent, **A3C** can use a single convolutional neural network with the actor and critic sharing weights, in two separate heads, one for the actor, and one for the critic. 
+
+Note that A3C does not have to be used exclusively with CNN's and images. But if you were to use it, sharing weights to some more efficient, more complex approach, and can be harder to train. 
+
+It's a good idea to start with two separate networks, and change it only to improve performance. 
+
+Now, one interesting aspect of A3C, is that instead of using a TD estimate, it will use another estimate commonly referred to as **N-step bootstrapping.**
+
+**N-step bootstrapping** is simply an abstraction and a generalization of a TD and Monte-Carlo estimates. 
+
+TD is a one-step bootstrapping. Your agent goes out and experiences one-time-step of real rewards, and then bootstraps right there. 
+
+Monte-Carlo goes out all the way, and it does not bootstrap because it doesn't need to. Monte-Carlo estimate is an infinite step bootstrapping. 
+
+**But, how about going more than one step, but not all the way out?**
+
+This is called _**n-step bootstrapping**, and A3C uses this kind of return to train the critic. 
+
+For example, in our tennis example, n-step bootstrapping means that you will wait a little bit before guessing what the final score will look like. Waiting to experience the environment for a little longer before you calcualte the expected return of the original state, allows you to have less bias in your prediction, keeping variance under control. 
+
+**In practice**, only a few steps out, say 4- or 5-step bootstrapping, are often the best. 
+
+By using n-step bootstrapping, A3C propagates values to the last end states visited, which allows for faster convergence with less experience required while still keeping variance under control. 
+
+See the video [here](https://youtu.be/twNXFplIAP8).
+
