@@ -91,6 +91,41 @@ So, let's calculate the implementation shortfall for this case.
 <img src="img/actor-critic18.png" alt="drawing" width="550"/>
 </p>
 
+Now, if we compare these two results (\$180 vs. \$267), we can see the the implementation shortfall in this case is bigger due to the random fluctuations in stock price. 
 
+We can think of this more realistic price model as the original price model, but with some noise added to it. So, let's see if we can write this out mathemtically. In particular, we'd like to try to write the 2nd implementation in terms of the 1st one.
 
+<p align="center">
+<img src="img/actor-critic19.png" alt="drawing" width="550"/>
+</p>
+
+And after simplificatin we can rewrite it as,
+
+<p align="center">
+<img src="img/actor-critic20.png" alt="drawing" width="550"/>
+</p>
+
+Note that the **expectation shortfall** will depend on how we sell our shares. For example, if we had decided to sell our shares in the fashion below, we'll have a different implementation shortfall. 
+
+<p align="center">
+<img src="img/actor-critic21.png" alt="drawing" width="550"/>
+</p>
+
+The way in which we decide to sell our stocks is called a **trade list.** The **trade list** tells us the number of trades and the quantity of shares to be sold at each trade. 
+
+The second term only depends on the random price fluctuations. The absolute value of this term gives us an idea of how much the stock price is fluctuating. This term will therefore represent how much money we can gain or lise due to the random price fluctuations. In finance, this random price fluctuations are referred to as **price volatility** or **risk.**
+
+**Risk** is usually quantified by the variance of the price fluctuations. So, if the price fluctuations of a particular stock are very big, we say that is a risky investment. 
+
+Now let's look at the problem again. 
+
+<p align="center">
+<img src="img/actor-critic22.png" alt="drawing" width="550"/>
+</p>
+
+However, we're bound to certain constraints. One of them is that we need to sell these shares within a given time frame. So, we need to set a limited number of trades within the liquidation period. 
+
+The other is that we need to take into account the **trader's risk aversion**. The trader's risk aversion that says how much a particular trader is willing to tolerate risk. For example, suppose the stock we're selling is experiencing a large volatility in the stock price. In this scenario, a trader that doesn't like to take risks would rather sell his shares as quickly as possible. On the other hand, a trader that does like to take risks will rather sell these shares at a constant rate over the whole liquidation period, even if the price volatility is high. 
+
+See the video [here](https://youtu.be/N2LP-wg1jEI).
 
