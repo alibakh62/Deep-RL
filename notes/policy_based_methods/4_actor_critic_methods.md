@@ -219,7 +219,9 @@ Looking at the update equations for these two methods, helps us understand them 
 
 As you can see below, in Sarsa the action used for calculating the TD target and the TD error is the action the agent will take in the following time step, `A'`. In Q-learning, however, the action used for calculating the target is the action with the highest value. But this action is not guaranteed to be used by the agent for interaction with the environment in the following time step. In other words, this is not necessarily `A'`. The Q-learning agent choose an exploratory action the next step. In Sarsa that action, exploratory or not, is already been chosen. 
 
-<>
+<p align="center">
+<img src="img/actor-critic8.png" alt="drawing" width="750"/>
+</p>
 
 Q-learning learns a deterministic optimal policy even if its behavior policy is totally random. Sarsa learns the best exploratory policy, that is the best policy that still explores. 
 
@@ -265,6 +267,88 @@ For a walk-through of the A2C code, watch [this video](https://youtu.be/LiUBJje2
 **NOTE:** Zhang has also implemented all the Sutton's book codes in Python (I believe the original codes are in LISP). Check out his [Github repo](https://github.com/ShangtongZhang/reinforcement-learning-an-introduction) for those codes.
 
 # GAE: Generalized Advantage Estimation
+There is another way for estimating expected returns called the **lambda return.** The intuition goes this way.
+
+Say after you try n-step bootstrapping you realize that numbers of n larger than 1 often perform better. But it's still hard to tell what that number should be. To make the decision even more difficult, in some problems small numbers of n are better while in others large number of n are better. **How do you get this right?** 
+
+The **idea of lambda return** is to create a mixture of all n-step bootstrapping estimates at once. **Lambda is hyperparameter** used for weighting the combination of each n-step estimate to the lambda return. The weights depends on the value you set for lambda and it decays exponentially at the rate of that value. 
+
+<p align="center">
+<img src="img/actor-critic9.png" alt="drawing" width="750"/>
+</p>
+
+So, for calculating the lambda return for state `S` at time step `t`, we would use all n-step returns and multiply each of the n-step return by the corresponding weight. Then add them all up. Remember, that sum will be the lambda return for state `S` at time step `t`.
+
+<p align="center">
+<img src="img/actor-critic10.png" alt="drawing" width="750"/>
+</p>
+
+Interestingly, when lambda is set to 0, the 2-step, 3-step, and all n-step return other than the 1-step return, will be equal to zero. **So, the lambda return when the lambda is set to zero will be equivalent to the TD estimate.** **If your lambda is set to one, all n-step return other than the infinite step return will be equal to zero.** **So, the lambda return when lambda is set to one, will be equivalent to the Monte-Carlo estimate.** 
+
+Again, a number between 0 and 1 gives a mixture of all n-step bootstrapping estimate. But, isn't this amazing that a single algorithm can do that?
+
+**GAE** is a way to train the critic with this lambda return. You can fit the advantage function just like in A3C and A2C or using a mixture of n-step bootstrapping estimates. 
+
+**It's important to highlight that this type of return can be combined with virtually any policy-based method.** In fact, in the paper that introduced GAE, TRPO was the policy-based method used. By using this type of estimation, this algorithm, TRPO + GAE trains very quickly because multiple value functions are spread on every time step due to the lambda return start estimate. Here is the [link to the paper](https://arxiv.org/abs/1506.02438)
+
+See the video [here](https://youtu.be/oLFocWp0dt0).
+
+# DDPG: Deep Deterministic Policy Gradient, Continuous Action-space
+**DDPG** is a different kind of actor-critic method. In fact, it could be seen as kind of approximate DQN, instead of an actual actor critic. The reason for this is that the critic in DDPG is used to approximate the maximizer over the Q values of the next state, and not as a learned baseline. Though, this is still a very important algorithm and it is good to discuss it in more detail. 
+
+One of the **limitations** of the DQN agent is that it is not straightforward to use in continuous action spaces. 
+
+Imagine a DQN network that takes in a state and outputs the action value function. For example, for two actions, say "Up" and "Down", `Q(s, "Up")` gives you the estimated expected value for selecting the "Up" action in state `s`, similarly for the "Down" action. To find the max action value function for this state, you just calculate the max of these values (pretty easy!). **It's very easy to do a max operation in this example because this is a discrete action space.** Even if you had more actions, or if it was high dimensional with many, many more actions, it would still be doable. **But, what if you need an action with continuous range? How do you get the value of a continuous action with this architecture?** Say, you want the "Jump" action to be continuous, a variable between 1 and 100 centimeters. How do you find the value of jump? **This is one of the problems DDPG solves.**
+
+In **DDPG**, we use two deep neural networks. We can call one the _actor_ and the other the _critic_. Now, the actor here is used to approximate the optimal policy deterministically. That means we want to always output the best believed action for any given state. This is unlike a stochastic policies in which we want the policy to learn a probability distribution over the actions.
+
+<p align="center">
+<img src="img/actor-critic11.png" alt="drawing" width="750"/>
+</p>
+
+In **DDPG**, we want the believed best action every single time we query the actor network. **That is a deterministic policy.** 
+
+The *actor* is basically learning the `argmax_{a}Q(s,a)`, which is the best action. The *critic* learns to evaluate the optimal action value function by using the actor's best believed action. 
+
+Agina, we use this actor, which is an approximate maximizer, to calculate a new target value for training the action value function, much in the way DQN does.
+
+See the video [here](https://youtu.be/0NVOPIyrr98).
+
+In the [DDPG paper](https://arxiv.org/abs/1509.02971), they introduced this algorithm as an "Actor-Critic" method. Though, some researchers think DDPG is best classified as a DQN method for continuous action spaces (along with [NAF](https://arxiv.org/abs/1603.00748)). Regardless, DDPG is a very successful method and it's good for you to gain some intuition.
+
+# DDPG: Deep Deterministic Policy Gradient, Soft Updates
+Two other interesting aspects of DDPG are:
+
+1. The use of a **replay buffer**,
+2. The **soft updates** to the target networks.
+
+You already know how the replay buffer part works. But the soft updates are a bit different. 
+
+In DQN, you have two copies of your network weights, the regular and the target network. In the Atari paper in which DQN was introduced, the target network is updated every 10,000 time steps. You simply copy the weights of your regular network into your target network. That is the target network is fixed for 10,000 time steps and then it gets a big update. 
+
+<p align="center">
+<img src="img/actor-critic12.png" alt="drawing" width="750"/>
+</p>
+
+In **DDPG**, you have two copies of your network weights for each network, a regular for the actor, a regular of the critic, a target for the actor, and a target for the critic. But in DDPG, the target networks are updated using a **soft update strategy**. 
+
+A **soft update strategy** consists of slowly blending your regular network weights with your target network weights. So, every time step you make your target network be 99.99% of your target network weights and only a 0.01% of your regular network weights. You slowly mix in your regular network weights into your target network weights. 
+
+<p align="center">
+<img src="img/actor-critic13.png" alt="drawing" width="750"/>
+</p>
+
+Recall that the *regualr network is the most up to date network* because it's the one we're training, while the *target network is the one we use for prediction to stabilize training.* 
+
+**In practice**, you'll get faster convergence by using this update strategy, and in fact, this way for updating the target network weights can be used with other algorithms that use target networks including DQN. 
+
+See the video [here](https://youtu.be/RT-HDnAVe9o).
+
+# DDPG Code Walkthrough
+
+For the codes, again, refer to the Shangtong Zhang's [GitHub repo](https://github.com/ShangtongZhang/DeepRL).
+
+See the walkthtough video [here](https://youtu.be/08V9r3NgFSE).
 
 
 
