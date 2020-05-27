@@ -70,3 +70,77 @@ Consider that now you both have two separate banks. Whoever misses the ball give
 Notice how in the cooperative setting both you and your sibling lose a coin while in the competitive setting, one loses a coin when the other gains a coin. So, the way reward is defind makes the agent's behavior apparently competitive or apparently collaborative. In many environments, the agents have to show a mixture of cooperative and competitive behaviors which leads to mixed cooperative-competitive environments. 
 
 # Research Topics
+The field of multi-agent RL is in the cutting edge of research. Recently, OpenAI announced that its team of five neural networks, OpenAI 5 has learned to defeat amatuer DOTA2 players. OpenAI 5 has been trained using a scaled-up version of BPO. Coordination between agents is controlled using a hyperparameter called **team spirit.** It ranges from 0 to 1, where 0 means agents can only care about the individual reward functions while one means that they completely care about the team's reward function. 
+
+# Paper Description
+There are many interesting papers out there on MARL. For the purposes of this lesson, we will stick to one particular paper called [“Multi Agent Actor Critic for Mixed Cooperative Competitive environments “](https://papers.nips.cc/paper/7217-multi-agent-actor-critic-for-mixed-cooperative-competitive-environments.pdf) by OpenAI.
+
+This paper implements a multi-agent version of **DDPG**. **DDPG** is an off-policy actor-critic algorithm that uses the concept of target networks. The input of the action network is the current state while the output is a real value or a vector representing an action chosen from a continuous action space. 
+
+OpenAI has created a multi-agent environment called **multi-agent particle.** It consists of particles that is agents and some landmarks. A lot of interesting experimental scenarios have been laid out in this environment. We've chosen one of the many scenarios called **physical deception.** 
+
+Here, any agents cooperate to reach the target landmark out of n landmarks. There is an adversary which is also trying to reach the target landmark, but it doesn't know which out of the n landmarks is the target landmark.
+
+<p align="center">
+<img src="img/marl2.png" alt="drawing" width="550"/>
+</p>
+
+The normal agents are rewarded based on the least distance of any of the agents to the landmark, and pernalized based on the distance between the adversary and the target landmark. Under this reward structure, the agents cooperate to spread out across all the landmarks, so as to deceive the adversary. 
+
+The framework of centralized trading with decentralized execution has been adopted in this paper. This implies that some extra information is used to ease **dreaming**, but that information is not used during the testing time. 
+
+This framework can be naturally implemented using an actor-critic algorithm. Let's see why.
+
+During training, the pretext for each agent uses extra information like states observed and actions taken by all the other regions. As for the actor, you'll notice that there is one for each agent. Each actor has access to only its agent's observation and actions.
+
+During execution time, only the actors are present, and hence, all observations and actions are used. 
+
+Learning critic for each agent allows us to use a different reward structure for each. Hence, the algorithm can be used in all, cooperative, competitive, and mixed scenarios. 
+
+<p align="center">
+<img src="img/marl3.png" alt="drawing" width="550"/>
+</p>
+
+See the video [here](https://youtu.be/4hFAhtLJR5U).
+
+# Lab Instructions
+For this Lab, you will train an agent to solve the  **Physical Deception**  problem.
+
+This is an ungraded project, Feel free to explore various parameters and see how it affects the way agents approach the problem.
+
+## Goal of the environment
+
+Blue dots are the "good agents", and the Red dot is an "adversary". All of the agents' goals are to go near the green target. The blue agents know which one is green, but the Red agent is color-blind and does not know which target is green/black! The optimal solution is for the red agent to chase one of the blue agent, and for the blue agents to split up and go toward each of the target.
+
+## Running within the workspace ( Recommended Option)
+
+----------
+
+-   No explicit setup commands need to run by you, we have taken care of all the installations in this lab, enjoy exploration.
+-   _./run_training.sh_ Let's you run the program based on the parameters provided in the main program.
+-   _./run_tensorboard.sh_  will give you an URL to view the dashboard where you would have visualizations to see how your agents are performing. Use this as a guide to know how the changes you made are affecting the program.
+-   Folder named  _Model_dir_  would store the  _episode-XXX.gif_  files which show the visualization on how your agent is performing.
+
+## Running on your own computer
+
+----------
+
+-   If you choose to run the program on your computer, you should download the files from the workspace and all the above commands should work the same except for few installations below.
+-   Use of GPU wouldn't impact the training time for this program, Instead, Multicore environments would be a better choice to increase the training speed.
+    
+    ## Requirements
+    
+    -   [OpenAI baselines](https://github.com/openai/baselines), commit hash: 98257ef8c9bd23a24a330731ae54ed086d9ce4a7
+    -   [PyTorch](http://pytorch.org/), version: 0.3.0.post4
+    -   [OpenAI Gym](https://github.com/openai/gym), version: 0.9.4
+    -   [Tensorboard](https://github.com/tensorflow/tensorboard), version: 0.4.0rc3 and  [Tensorboard-Pytorch](https://github.com/lanpa/tensorboard-pytorch), version: 1.0 (for logging)
+
+## To Experiment
+
+-   Feel free to clear the  _model_dir_  and  _log_  folder and start training on your own to see how your agent performs.  _./clean.sh_  should help you accomplish this goal.
+-   This lab is meant to prepare you for the final project, writing your own functions in  _maddpg.py_  will improve your learning curve.
+-   Also experiment with parameter tuning in  _main.py_, Make note that a larger number of episodes would mean greater training time.
+-   Lab might take more than one hour to train depending on how the parameters are tuned.
+
+**Find the codes under `codes/DDPG_lab`.**
+
