@@ -87,6 +87,207 @@ Please do not write or execute any code just yet. We'll get started with coding 
 Review the codes under the [codes folder](codes/Dynamic_Programming_Solution.ipynb).
 
 # Another Grid World Example
-Let's begin with a very small world and an agent who lives in it. The world is primarily composed of nice patches of grass, but one of the four locations in the world has a large mountain. We can think of each of these four possible locations in the world as states in the environment.
+Watch the video [here](https://youtu.be/n9SbomnLb-U).
 
-At each point in time, let's say the ag
+In this simple gridworld example, you may find it easy to determine the optimal policy by visual inspection. Of course, solving Markov decision processes (MDPs) corresponding to real world problems will prove far more challenging! :)
+
+To avoid over-complicating the theory, we'll use this simple example to illustrate the same algorithms that are used to solve much more complicated MDPs.
+
+# An Iterative Method, Part 1
+Watch the video [here](https://youtu.be/AX-hG3KvwzY).
+
+# An Iterative Method, Part 2
+
+<p align="center">
+<img src="img/st1.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st2.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st3.png" alt="drawing" width="750"/>
+</p>
+
+**Note**. This example serves to illustrate the fact that it is **_possible_** to _directly_ solve the system of equations given by the Bellman expectation equation for v_\pivπ​. However, in practice, and especially for much larger Markov decision processes (MDPs), we will instead use an _iterative_ solution approach.
+
+# Quiz: An Iterative Method
+<p align="center">
+<img src="img/st4.png" alt="drawing" width="750"/>
+</p>
+
+## An Iterative Method
+<p align="center">
+<img src="img/st5.png" alt="drawing" width="750"/>
+</p>
+
+# Iterative Policy Evaluation
+Watch the video [here](https://youtu.be/fVUpoyZDyGE).
+
+# Implementation: Iterative Policy Evaluation
+<p align="center">
+<img src="img/st6.png" alt="drawing" width="750"/>
+</p>
+
+Please use the next concept to complete  **Part 0: Explore FrozenLakeEnv**  and  **Part 1: Iterative Policy Evaluation**  of  `Dynamic_Programming.ipynb`. Remember to save your work!
+
+If you'd like to reference the pseudocode while working on the notebook, you are encouraged to open  [this sheet](https://github.com/udacity/rl-cheatsheet/blob/master/cheatsheet.pdf)  in a new window.
+
+Feel free to check your solution by looking at the corresponding sections in  `Dynamic_Programming_Solution.ipynb`. (_In order to access this file, you need only click on "jupyter" in the top left corner to return to the Notebook dashboard._)
+
+[](https://classroom.udacity.com/nanodegrees/nd893/parts/23d1307b-b908-436f-bdfe-78b6c5712b04/modules/9765795d-fea0-43f7-b49e-0bddba750950/lessons/62060219-95b0-4d08-8269-3b963c1c27bb/concepts/90db191c-be3f-42d8-ac98-11fe6ad8d1de#)
+
+![](https://video.udacity-data.com/topher/2018/January/5a61eb50_screen-shot-2017-12-17-at-9.41.03-am/screen-shot-2017-12-17-at-9.41.03-am.png)
+
+To find  `Dynamic_Programming_Solution.ipynb`, return to the Notebook dashboard.
+
+### (Optional) Additional Note on the Convergence Conditions
+
+To see intuitively  _why_  the conditions for convergence make sense, consider the case that neither of the conditions are satisfied, so:
+
+<p align="center">
+<img src="img/st7.png" alt="drawing" width="750"/>
+</p>
+
+# Mini Project: DP (part 0 and 1)
+Refer to the [codes section here](codes/DP_mini_project_part1/Dynamic_Programming_Solution.ipynb)
+
+# Action Values
+<p align="center">
+<img src="img/st8.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st9.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st10.png" alt="drawing" width="750"/>
+</p>
+
+# Implementation: Estimation of Action Values
+<p align="center">
+<img src="img/st11.png" alt="drawing" width="750"/>
+</p>
+
+If you'd like to reference the pseudocode while working on the notebook, you are encouraged to open  [this sheet](https://github.com/udacity/rl-cheatsheet/blob/master/cheatsheet.pdf)  in a new window.
+
+Feel free to check your solution by looking at the corresponding section in  `Dynamic_Programming_Solution.ipynb`.
+
+# Mini Project: DP, Part 2
+See the codes [here](codes/DP_mini_project_part2/Dynamic_Programming_Solution.ipynb)
+
+# Policy Improvement
+Watch the video [here](https://youtu.be/4_adUEK0IHg).
+
+# Implementation: Policy Improvement
+<p align="center">
+<img src="img/st12.png" alt="drawing" width="750"/>
+</p>
+
+Please use the next concept to complete  **Part 3: Policy Improvement**  of  `Dynamic_Programming.ipynb`. Remember to save your work!
+
+If you'd like to reference the pseudocode while working on the notebook, you are encouraged to open  [this sheet](https://github.com/udacity/rl-cheatsheet/blob/master/cheatsheet.pdf)  in a new window.
+
+Feel free to check your solution by looking at the corresponding section in  `Dynamic_Programming_Solution.ipynb`.
+
+# Mini Project: DP, Part 3
+See the codes [here](codes/DP_mini_project_part3/Dynamic_Programming_Solution.ipynb)
+
+# Policy Iteration
+Watch the video [here](https://youtu.be/gqv7o1kBDc0).
+
+# Implementation: Policy Iteration
+<p align="center">
+<img src="img/st13.png" alt="drawing" width="750"/>
+</p>
+
+# Mini Project: DP, Part 4
+See the codes [here](codes/DP_mini_project_part4/Dynamic_Programming_Solution.ipynb)
+
+# Truncated Policy Iteration
+Watch the video [here](https://youtu.be/a-RvCxlPMho).
+
+# Implementation: Truncated Policy Iteration
+In the previous concept, you learned about  **truncated policy evaluation**. Whereas (iterative) policy evaluation applies as many Bellman updates as needed to attain convergence, truncated policy evaluation only performs a fixed number of sweeps through the state space.
+
+The pseudocode can be found below.
+
+<p align="center">
+<img src="img/st14.png" alt="drawing" width="750"/>
+</p>
+
+We can incorporate this amended policy evaluation algorithm into an algorithm similar to policy iteration, called  **truncated policy iteration**.
+
+The pseudocode can be found below.
+
+<p align="center">
+<img src="img/st15.png" alt="drawing" width="750"/>
+</p>
+
+You may also notice that the stopping criterion for truncated policy iteration differs from that of policy iteration. In policy iteration, we terminated the loop when the policy was unchanged after a single policy improvement step. In truncated policy iteration, we stop the loop only when the value function estimate has converged.
+
+You are strongly encouraged to try out both stopping criteria, to build your intuition. However, we note that checking for an unchanged policy is unlikely to work if the hyperparameter  `max_iterations`  is set too small. (To see this, consider the case that  `max_iterations`  is set to a small value. Then even if the algorithm is far from convergence to the optimal value function  v_*v∗​  or optimal policy  \pi_*π∗​, you can imagine that updates to the value function estimate  VV  may be too small to result in any updates to its corresponding policy.)
+
+Please use the next concept to complete  **Part 5: Truncated Policy Iteration**  of  `Dynamic_Programming.ipynb`. Remember to save your work!
+
+If you'd like to reference the pseudocode while working on the notebook, you are encouraged to open  [this sheet](https://github.com/udacity/rl-cheatsheet/blob/master/cheatsheet.pdf)  in a new window.
+
+Feel free to check your solution by looking at the corresponding section in  `Dynamic_Programming_Solution.ipynb`.
+
+# Mini Project: DP, Part 5
+See the codes [here](codes/DP_mini_project_part5/Dynamic_Programming_Solution.ipynb)
+
+# Value Iteration
+Watch the video [here](https://youtu.be/XNeQn8N36y8).
+
+# Implementation: Value Iteration
+<p align="center">
+<img src="img/st16.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st17.png" alt="drawing" width="750"/>
+</p>
+
+Please use the next concept to complete  **Part 6: Value Iteration**  of  `Dynamic_Programming.ipynb`. Remember to save your work!
+
+If you'd like to reference the pseudocode while working on the notebook, you are encouraged to open  [this sheet](https://github.com/udacity/rl-cheatsheet/blob/master/cheatsheet.pdf)  in a new window.
+
+Feel free to check your solution by looking at the corresponding section in  `Dynamic_Programming_Solution.ipynb`.
+
+# Mini Project: DP, Part 6
+See the codes [here](codes/DP_mini_project_part6/Dynamic_Programming_Solution.ipynb)
+
+# Check Your Understanding
+
+Congratulations! At this point in the lesson, you have written your own implementations of many classical dynamic programming algorithms. This is no easy feat, and you should be proud of all of your hard work!
+
+We encourage you to take your time with this content. Tinker more with the mini project to develop your intuition, and read Chapter 4 (especially 4.1-4.4) of the  [textbook](http://go.udacity.com/rl-textbook)  to supplement your understanding.
+
+**You are strongly encouraged to take your own notes**. You may find it useful to compare your notes with the next concept, which contains a summary of the main ideas from the lesson.
+
+When you're ready, answer the question below to check your memory of the terminology.
+
+# Summary
+<p align="center">
+<img src="img/st18.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st19.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st20.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st21.png" alt="drawing" width="750"/>
+</p>
+
+<p align="center">
+<img src="img/st22.png" alt="drawing" width="750"/>
+</p>
+
