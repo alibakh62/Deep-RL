@@ -129,3 +129,24 @@ The other is that we need to take into account the **trader's risk aversion**. T
 
 See the video [here](https://youtu.be/N2LP-wg1jEI).
 
+# Almergen and Chriss Model
+
+Watch [this video](https://youtu.be/rokcEQ4LXbU).
+
+Find the scripts under the codes folder.
+
+# Trading Lists
+
+Watch [this video](https://youtu.be/cGT-ADpHR74).
+
+Find the scripts under the codes folder.
+
+# The Efficient Frontier
+
+Watch [this video](https://youtu.be/EwM7Ksbs-ds).
+
+Find the scripts under the codes folder.
+
+# DRL for Optimal Execution of Porfolio Transactions
+
+Find the scripts under the codes folder.
