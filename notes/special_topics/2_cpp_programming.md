@@ -4972,3 +4972,1541 @@ std::vector<float>::size_type Matrix::getCols() {
 }
 ```
 
+# Matrix Functions
+
+The last part of the Matrix class involves implementing the matrix functionality. You are welcome to program as many matrix operations as you'd like: addition, multiplication, transpose, inverse, etc.
+
+We recommend at least implementing matrix addition and a function called matrix_print that outputs the matrix to the terminal using cout. In the solution given at the end of this page, we've also provided code for a matrix_transpose function.
+
+Implementing these class functions is the same as implementing the get and set functions from the previous part of the lesson; you will need to declare your functions in matrix.h and define your functions in matrix.cpp. The general syntax is the same:
+
+#### class function declaration syntax
+
+```cpp
+output_datatype functionname(datatype variable1, 
+datatype variable2, ..., datatype variablen)
+```
+
+#### class function definition syntax
+
+```cpp
+output_datatype Classname::functionname(datatype variable1, 
+datatype variable2, ..., datatype variablen) {
+
+    code defining the function;
+}
+```
+
+# Writing the Matrix Functions
+
+In this exercise, you will declare and define a Matrix class function that adds two matrices together. Here are the inputs and outputs of the matrix addition function:
+
+INPUTS:
+
+-   a matrix, which will be added to the grid variable
+
+OUTPUTS
+
+-   a matrix containing the sum of the grid variable matrix and input matrix
+
+Because the input to the matrix_addition function is a Matrix, you will need to declare and define your function using the Matrix class as the data type. This might seem a bit confusing, but the Gaussian class presented earlier in the lesson did the same thing with the mul and add functions. You can use those as a guide for writing your matrix_addition functions.
+
+As a reminder, here are the function declarations for the mul and add functions in gaussian.h:
+
+```cpp
+        Gaussian mul (Gaussian);
+        Gaussian add (Gaussian);
+```
+
+Both of these functions receive a Gaussian and output a Gaussian. Here are the function definitions from gaussian.cpp:
+
+```cpp
+Gaussian Gaussian::mul(Gaussian other) {
+    float denominator;
+    float numerator;
+    float new_mu;
+    float new_var;
+
+    denominator = sigma2 + other.getSigma2();
+    numerator = mu * other.getSigma2() + other.getMu() * sigma2;
+    new_mu = numerator / denominator;
+
+    new_var = 1.0 / ( (1.0 / sigma2) + (1.0 / other.sigma2) );
+
+    return Gaussian(new_mu, new_var);
+}
+
+Gaussian Gaussian::add(Gaussian other) {
+
+    float new_mu;
+    float new_sigma2;
+
+    new_mu = mu + other.getMu();
+    new_sigma2 = sigma2 + other.getSigma2();
+
+    return Gaussian(new_mu, new_sigma2);
+}
+```
+
+Although the implementation of the matrix_addition function will be different, the general structure will be the same as the mul and add functions from the Gaussian example.
+
+You will also write a matrix_print function that outputs a matrix to the terminal using cout. The matrix_print function has no inputs and no outputs.
+
+Fill out the TODOS in the matrix.cpp and matrix.h code.
+
+```cpp
+
+// main.cpp
+#include <iostream>
+#include <vector>
+#include "matrix.h"
+
+int main () {
+    
+    // TODO: Nothing to do here
+    
+    return 0;
+}
+```
+
+```cpp
+
+// matrix.cpp
+#include "matrix.h"
+
+Matrix::Matrix() {
+    std::vector <std:: vector <float> > initial_grid (10, std::vector <float>(5, 0.5));
+    grid = initial_grid;
+    rows = initial_grid.size();
+    cols = initial_grid[0].size();
+
+}
+
+Matrix::Matrix(std::vector <std:: vector <float> > initial_grid) {
+    grid = initial_grid;
+    rows = initial_grid.size();
+    cols = initial_grid[0].size();
+}
+
+void Matrix::setGrid(std::vector< std::vector<float> > new_grid) {
+    grid = new_grid;
+    rows = new_grid.size();
+    cols = new_grid[0].size();
+
+}
+
+std::vector< std::vector<float> > Matrix::getGrid() {
+    return grid;
+}
+
+std::vector<float>::size_type Matrix::getRows() {
+    return rows;
+}
+
+std::vector<float>::size_type Matrix::getCols() {
+    return cols;
+}
+
+Matrix Matrix::matrix_transpose() {
+    std::vector< std::vector<float> > new_grid;
+    std::vector<float> row;
+
+    for (int i = 0; i < cols; i++) {
+        row.clear();
+
+        for (int j = 0; j < rows; j++) {
+            row.push_back(grid[j][i]); 
+        }
+        new_grid.push_back(row);
+    }
+
+    return Matrix(new_grid);
+}
+
+Matrix Matrix::matrix_addition(Matrix other) {
+
+    if ((rows != other.getRows()) || (cols != other.getCols())) {
+        throw std::invalid_argument( "matrices are not the same size" );
+    }
+
+    std::vector< std::vector<float> > othergrid = other.getGrid();
+
+    std::vector< std::vector<float> > result;
+
+    std::vector<float> new_row;
+
+    for (int i = 0; i < rows; i++) {
+        new_row.clear();
+        for (int j = 0; j < cols; j++) {
+            new_row.push_back(grid[i][j] + othergrid[i][j]);
+        }
+        result.push_back(new_row);
+    }
+
+    return Matrix(result);
+}
+
+void Matrix::matrix_print() {
+
+    std::cout << std::endl;
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            std::cout << grid[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+```
+
+```cpp
+
+//matrix.h
+#include <vector>
+#include <iostream>
+#include <stdexcept>
+
+class Matrix
+{
+    private:
+
+        std::vector< std::vector<float> > grid;
+        std::vector<float>::size_type rows;
+        std::vector<float>::size_type cols;
+
+    public:
+
+        // constructor functions
+        Matrix ();
+        Matrix (std::vector< std::vector<float> >);
+
+        // set functions
+        void setGrid(std::vector< std::vector<float> >);
+
+        // get functions
+        std::vector< std::vector<float> > getGrid();
+        std::vector<float>::size_type getRows();
+        std::vector<float>::size_type getCols();
+
+        // matrix functions
+        Matrix matrix_transpose();
+        Matrix matrix_addition(Matrix);
+
+        // matrix printing
+        void matrix_print();
+
+};
+```
+
+# Use an Inclusion Guard
+
+## ifndef
+In this case, you don't really need an ifndef statement because the code is simple. You have only written one class, so there isn't a way to mistakenly include another class multiple times. However, it's a good habit to write inclusion guards with an ifndef statement.
+
+For this exercise, use the ifndef syntax to write an inclusion guard in the matrix.h file.
+
+```cpp
+
+// matrix.h
+#ifndef MATRIX_H
+#define MATRIX_H
+
+#include <vector>
+#include <iostream>
+#include <stdexcept>
+
+class Matrix
+{
+    private:
+
+        std::vector< std::vector<float> > grid;
+        std::vector<float>::size_type rows;
+        std::vector<float>::size_type cols;
+
+    public:
+
+        // constructor functions
+        Matrix ();
+        Matrix (std::vector< std::vector<float> >);
+
+        // set functions
+        void setGrid(std::vector< std::vector<float> >);
+
+        // get functions
+        std::vector< std::vector<float> > getGrid();
+        std::vector<float>::size_type getRows();
+        std::vector<float>::size_type getCols();
+
+        // matrix functions
+        Matrix matrix_transpose();
+        Matrix matrix_addition(Matrix);
+
+        // matrix printing
+        void matrix_print();
+
+};
+
+#endif /* MATRIX_H */
+```
+
+# Instantiate an Object
+
+Now it's time to use your matrix class in a program! The C++ syntax for instantiating an object is like this:
+
+```cpp
+Classname objectname(inputs for initializing an object of Classname);
+```
+
+Then you can access any public variables like:
+
+```cpp
+objectname.variablename
+```
+
+And you can access your public functions with:
+
+```cpp
+objectname.methodname(inputs)
+```
+
+Remember that any private variables or functions will not be available to your program. That was why you wrote the public get and set functions for your private variables.
+
+# Gaussian.cpp Example
+
+Before you start using your matrix class, here is a reminder of what the main.cpp looked like for the Gaussian.cpp example:
+
+```cpp
+#include <iostream>
+#include "gaussian.h"
+
+int main ()
+{
+
+    Gaussian mygaussian(30.0,20.0);
+    Gaussian othergaussian(10.0,30.0);
+
+    std::cout << "average " << mygaussian.getMu() << std::endl;
+    std::cout << "evaluation " << mygaussian.evaluate(15.0) << std::endl;
+
+    std::cout << "mul results sigma " << 
+               mygaussian.mul(othergaussian).getSigma2() << std::endl;
+    std::cout << "mul results average " << 
+               mygaussian.mul(othergaussian).getMu() << std::endl;
+
+    std::cout << "add results sigma " << 
+               mygaussian.add(othergaussian).getSigma2() << std::endl;
+    std::cout << "add results average " << 
+               mygaussian.add(othergaussian).getMu() << std::endl;
+
+    return 0;
+}
+```
+
+Now it's your turn to instantiate a Matrix object. You will find some starter code below with a few TODOs.
+
+```cpp
+
+// main.cpp
+#include <iostream>
+#include <vector>
+#include "matrix.h"
+
+int main () {
+
+    // assign a 7x5 matrix to the variable initial_grid
+    // all values in the matrix are 0.4
+    std::vector <std:: vector <float> > 
+        initial_grid (7, std::vector <float>(5, 0.4));
+
+    // TODO: Use the initial grid variable to instantiate a matrix object
+    // The matrix object should be called matrixa
+    Matrix matrixa(initial_grid);
+
+    // TODO: Use the matrix_print() method to print out matrixa
+    matrixa.matrix_print();
+
+    // TODO: Print out the number of rows in matrixa. You will need
+    // to use the getRows() function and std::cout
+    std::cout << matrixa.getRows();
+
+    // TODO: Print out the number of columns in matrixa 
+    std::cout << matrixa.getCols();
+
+    // TODO: Take the transpose of matrixa and store the results in
+    // a variable called transposea
+    Matrix transposea = matrixa.matrix_transpose();
+
+    // TODO: Print out transposea
+    transposea.matrix_print();
+
+    // Now you will use another 7x5 matrix called matrixb to 
+    // give the results of the matrix_addition function
+
+    // 7x5 2-dimensional vector with values 0.2
+    std::vector <std:: vector <float> > 
+        second_grid (7, std::vector <float>(5, 0.2));
+
+    // TODO: Instantiate an object called matrixb. Use the second_grid
+    // variable as the input to initialize matrixb
+    Matrix matrixb(second_grid);
+
+    // TOOD: Add matrixa and matrixb. Store the results in a new matrix
+    // variable called matrixsum
+    Matrix matrixsum(matrixa.matrix_addition(matrixb));
+
+    // TODO: Print out the matrix contained in the matrixsum variable
+    matrixsum.matrix_print();
+
+    return 0;
+}
+```
+
+# Compiling your Program
+
+If you haven't gotten C++ running locally on your computer, now's a good time to get that done!
+
+This is just a quick note about compiling and running the matrix code on your local computer. Put your main.cpp, matrix.cpp and matrix.h into the same directory. On Linux and Mac you can compile your code with a command like:
+
+```bash
+g++ main.cpp matrix.cpp
+```
+
+or whatever the equivalent is for your system or compiler. You need to compile both main.cpp and matrix.cpp for the code to compile. Then you can execute your code with something like
+
+```bash
+./a.out
+```
+
+On Windows, compiling and executing your code will look something like this:
+
+```bash
+cl /W4 /EHsc main.cpp matrix.cpp
+
+main
+```
+
+# C++: Intro to Optimization
+
+Watch [this video](https://youtu.be/Kdx1_BI5ddc).
+
+# Intro to Computer Hardware
+
+Watch [this video](https://youtu.be/WDMGkq9mkB8).
+
+## Compilers and Optimization
+
+As mentioned in the video, a C++ compiler rewrites your code into binary instructions. Many compilers will try to optimize code for you. These optimizations aim to
+
+-   make the code run faster,
+-   use less memory, or
+-   consume less electric power.
+
+Compilers can be quite good at optimizing as they write your C++ code into machine code; however, when running the same code through different compilers, you might find that the slowest parts of your code are not the same in each case. Hence, it's important to find the weak spots by actually measuring how long it takes to execute or how many resources the code uses. You'll learn more about measuring your code later in the lesson.
+
+## Hardware Limitations
+
+Hardware can put limitations on your programs and lead to code inefficiencies.
+
+In embedded systems engineering, you might not always be working with the newest and most powerful computer processors. A typical example would be trigonometric functions. Some computer architectures might use relatively slow software approximations for a sine function rather than using the arithmetic/logic unit. If you can use an approximation that runs directly on the CPU's arithmetic/logic unit, you might get your code to run faster.
+
+## C++ Demonstrations
+This lesson contains a series of demonstrations showing how C++ manages memory. You'll see in the next part that these demonstrations are embedded into the classroom.
+
+Each demonstration is contained in a separate folder with a set of instructions and code. The next section gives more details about how you will run the demonstrations.
+
+# Embedded Terminal
+
+In this lesson (C++ Intro to Optimization) and the following lesson (C++ Optimization Practice), you'll be using a feature of that classroom that you haven't seen yet.
+
+When you go to the next part of the lesson, an embedded command line tool will load. The command line allows you to execute commands directly to a computer instead of using a mouse and user interface. On Macs and Linux machines, there is a program called Terminal that allows you to type and execute these commands. The equivalent in Windows is the Console Window.
+
+Here is a screenshot of what the embedded command line tool interface looks like:
+
+![Command Line Interface](https://video.udacity-data.com/topher/2017/November/5a078e9d_cli/cli.jpg)
+
+Command Line Interface
+
+The following video walks you through how to use the embedded terminal.
+
+Watch [this video](https://youtu.be/Bhl5JQ_N9V8).
+
+# Linux Commands
+
+To learn more about using the command line in the terminal, check out these links:
+
+-   [Top 10 linux commands](https://www.lifewire.com/linux-commands-for-navigating-file-system-4027320)
+-   [Basic Linux Commands](https://diyhacking.com/linux-commands-for-beginners/)
+
+### File Navigation
+
+In the C++ lesson, each demonstration or exercise uses this interface. In the top left corner, you'll find the file browser. Each demo or exercise is contained in its own folder. The name of the folder corresponds with the title of the current lesson section. For example, the next lesson section is called "Demo: Machine Code", and the folder is called "demo_machine_code".
+
+Here is a screenshot of where the file browser is located:
+
+![File Browser](https://video.udacity-data.com/topher/2017/November/5a078f3e_files/files.jpg)
+
+File Browser
+
+If you double click on a folder, the folder will open. Likewise, double clicking on a file will open the file in a text editor. You can also right-click on a file or folder to download or delete it among other options. The plus sign is used to add new files or folders as well as to upload files or folders.
+
+This next image shows where the text editor is located:
+
+### Text Editor
+
+![Text Editor](https://video.udacity-data.com/topher/2017/November/5a078fc6_texteditor/texteditor.jpg)
+
+Text Editor
+
+You can edit text files in the text editor. In the C++ exercises, this is where you will be modifying or writing C++ code. The classroom saves your work automatically as you modify files.
+
+### Terminal Window
+
+To actually run commands that will compile and execute your C++ programs, you will need to open a terminal window. You click where it says "New Terminal" in the middle bottom of the screen:
+
+![New Terminal Button](https://video.udacity-data.com/topher/2017/November/5a0792cf_emptyterminal/emptyterminal.jpg)
+
+New Terminal Button
+
+And this opens a new terminal window:
+
+![Terminal Window](https://video.udacity-data.com/topher/2017/November/5a079548_untitled-drawing/untitled-drawing.jpg)
+
+Terminal Window
+
+The terminal window is where you'll type commands to execute your C++ code. The exercises and demos include instruction files that tell you what commands to type and in what order. So you do not need to learn command line syntax for these lessons.
+
+However, here is an explanation of what those commands do:
+
+```
+cd foldername
+
+```
+
+cd stands for "change directory". You can use the cd command to change what directory your terminal window is looking at
+
+```
+g++ main.cpp other_files.cpp
+
+```
+
+This command compiles your C++ program. Sometimes you'll also see a command like:
+
+```
+g++ -std=c++11 main.cpp other_files.cpp
+
+```
+
+This command tells the compiler to use the C++11 standard. By default the compiler uses C++98. C++11 contains a handful of features that C++98 does not contain. So whenever a program uses a feature of C++11, you need to tell the compiler.
+
+The last command you'll see in these lessons is
+
+```
+./a.out
+
+```
+
+When you compile your programs, the compiler outputs a file called a.out.
+
+Executing  `./a.out`  on the command line will run your program.
+
+If you'd like to learn more about the basics of terminal commands, here is a link to an introductory article:  [terminal commands](https://www.techrepublic.com/article/16-terminal-commands-every-user-should-know/).
+
+### Menu
+
+The embedded command line interface also has a menu in the bottom left corner.
+
+![](https://video.udacity-data.com/topher/2017/November/5a0797a8_menu/menu.jpg)
+
+If you click on the menu, you'll see two options:
+
+![](https://video.udacity-data.com/topher/2017/November/5a0797f2_menuopen/menuopen.jpg)
+
+REFRESH WORKSPACE will restart the workspace. It will not erase your work.
+
+However, RESET DATA will restart the workspace AND replace all of your files with the original workspace files. You will lose all of your work including any extra files you created in the workspace.
+
+If you notice a red dot down in this corner, that means there have been updates made to the Workspace. If you'd like to work with the updated version of the Workspace, you will need to RESET DATA, but again, make sure you have separately saved down any work you want to keep to outside of the workspace!
+
+# DEMO: Machine Code
+
+## Instructions
+### C++ versus Machine Code
+
+C++ is a high level language that makes it easier for us humans to write computer programs. But, a computer cannot understand C++ directly. Your compiler converts your C++ code into machine code, which is a language that the CPU (central processing unit) understands. Machine code is a series of zeros and ones, which is how your computer communicates.
+
+You can actually see what machine code looks like. In the workspace below, open a terminal window and type the following three lines. Make sure to hit enter after typing each line:
+
+```
+cd demo_machine_code
+g++ -c machine_code.cpp
+xxd -b machine_code.o
+```
+The -c flag in g++ tells the compiler to output an object file, which is machine code. 
+
+The xxd command ouputs the .o file in its binary representation. Looking at the output, the first column is just a row number written in [hexadecimal](https://simple.wikipedia.org/wiki/Hexadecimal_numeral_system). Then each of the following six columns contains one byte of information. And the last column shows you the text representation that is in the file.
+
+You'll see there are over 1200 lines of machine code just to represent a program that assigns an integer value to a variable.
+
+```cpp
+
+// machine_code.cpp
+int main() {
+  
+  	int x;
+  	x = 5;  
+ 	return 0; 
+}
+```
+
+## demo binary
+1. Double click on the demo_binary folder and open the main.cpp file. Study the code. The demo shows you the binary representations of the character 'a', the integer 97 and the float 97.0. In C++, all variables are stored in binary.
+
+2. If you don't already have a terminal window open, click below on "new terminal" to open a new terminal window.
+
+3. To run the demo, type the following two commands into the the command line:
+
+```bash
+cd  /home/workspace/demo_binary
+g++ main.cpp
+./a.out
+```
+
+```cpp
+
+// main.cpp
+#include <iostream>
+#include <bitset>
+#include <cstring>
+
+int main() {
+
+    std::cout << "Representations of the number 97 \n";
+
+  	// Character 'a' represented in binary
+    std::cout << "\n char: \n" << std::bitset<8>('a') << "\n";
+  
+  	// Integer 97 represented with 8 bits
+    std::cout << "\n 8-bit integer: \n" << std::bitset<sizeof(char) * 8>(97) << "\n";
+  
+  // Integer 97 represented with 32 bits
+    std::cout << "\n 32-bit: \n" << std::bitset<sizeof(int) * 8>(97) << "\n";
+    
+  // Float 97.0 represented with 32 bits
+    float example = 97.0;
+    char binary[sizeof(float)];
+    
+    memcpy(binary, &example, sizeof(float));
+    
+    std::cout << "\n 32-bit float 97.0:  " << "\n";
+    
+    for (int i = 0; i < sizeof(float); ++i) {
+        std::cout << std::bitset<sizeof(char)*8 >(binary[i]);
+    }
+    
+    std::cout << "\n";
+    
+    return 0;
+}
+```
+
+## demo floats
+
+_Instructions same as above._
+
+```cpp
+
+#include <stdio.h>
+#include <iostream>
+#include <bitset>
+#include <cstring>
+
+
+int main() {
+    
+    // Float represented with 32 bits
+    float example = 97.148;
+    char binary[sizeof(float)];
+    
+    memcpy(binary, &example, sizeof(float));
+    
+    std::cout << "\n 32-bit float 97.148:  " << "\n";
+    
+    for (int i = 0; i < sizeof(float); ++i) {
+        std::cout << std::bitset<sizeof(char)*8 >(binary[i]);
+    }
+    
+    std::cout << "\n";
+
+    // Float represented with 32 bits
+    example = 97.1485945;
+    
+    memcpy(binary, &example, sizeof(float));
+
+  std::cout << "\n 32-bit float 97.1485945:  " << "\n";
+  
+    for (int i = 0; i < sizeof(float); ++i) {
+        std::cout << std::bitset<sizeof(char)*8 >(binary[i]);
+    }
+    
+    std::cout << "\n";
+    
+    
+    
+    // Float represented with 32 bits
+    example = 97.148594576678755667;
+    
+    memcpy(binary, &example, sizeof(float));
+  
+  	std::cout << "\n 32-bit float 97.148594576678755667:  " << "\n";
+
+    for (int i = 0; i < sizeof(float); ++i) {
+        std::cout << std::bitset<sizeof(char)*8 >(binary[i]);
+    }
+    
+    std::cout << "\n";
+
+    return 0;
+}
+```
+
+## Demo: Stack vs Heap
+
+This demo shows how memory is allocated on the stack versus on the heap. To run the demo, open a new terminal window and type the following commands:
+
+```bash
+cd /home/workspace/demo_stack_heap
+g++ main.cpp
+./a.out
+```
+
+The demo code creates five integer variables on the stack and five integer variables on the heap. The program then prints out their adddresses in memory. You'll see the results in hexadecimal as well as in binary format. Notice that the stack first assigns a higher number address and then works backwards. Each integer takes up 4 bytes of memory.
+
+The heap, on the other hand, starts with lower number addresses and increases. Exactly what addresses get assigned will vary from system to system when the program executes. 
+
+```cpp
+
+#include <iostream>
+
+int main() {
+    
+    // declare integer variables
+    int a, b, c, d, e;
+    a = 5;
+    b = 17;
+    c = 2;
+    d = 40;
+    e = 38;
+
+    // print out the addresses for each variable
+    // The ampersand symbol gives access to the address of a variable
+    std::cout << "hexadecimal addresses on the stack: \n";
+    std::cout << &a << "\n";
+    std::cout << &b << "\n";
+    std::cout << &c << "\n";
+    std::cout << &d << "\n";
+    std::cout << &e << "\n \n";
+
+    // show the addresses in decimal notation so that they are easier to interpret
+    std::cout << "same addresses in decimal: \n";
+    std::cout << (long int)&a << "\n";
+    std::cout << (long int)&b << "\n";
+    std::cout << (long int)&c << "\n";
+    std::cout << (long int)&d << "\n";
+    std::cout << (long int)&e << "\n";
+
+    // declare pointers for integer variables
+    int * f;
+    int * g;
+    int * h;
+    int * i;
+    int * j;
+    
+    // use the new operator for dynamic memory allocation
+    f = new int;
+    g = new int;
+    h = new int;
+    i = new int;
+    j = new int;
+    
+    // assign values to the pointers
+    *f = 5;
+    *g = 17;
+    *h = 2;
+    *i = 40;
+    *j = 38;
+    
+    // print out the hexadecimal addresses for these variables
+    std::cout << "\n hexadecimal addresses on the heap: \n";
+    std::cout << f << "\n";
+    std::cout << g << "\n";
+    std::cout << h << "\n";
+    std::cout << i << "\n";
+    std::cout << j << "\n \n";
+    
+    
+    // print out the decimal addresses for these variables
+    std::cout << "same addresses in decimal: \n";
+    
+    std::cout << (long int)f << "\n";
+    std::cout << (long int)g << "\n";
+    std::cout << (long int)h << "\n";
+    std::cout << (long int)i << "\n";
+    std::cout << (long int)j << "\n";
+
+    
+    delete f;
+    delete g;
+    delete h;
+    delete i;
+    delete j;
+    
+    f = NULL;
+    g = NULL;
+    h = NULL;
+    i = NULL;
+    j = NULL;
+    
+    return 0;
+}
+```
+
+### Assembly Language
+
+In between C++ and machine code there is actually another language called  _assembly language_. Assembly language is a human readable low-level language that gets you even closer to the hardware than C++.
+
+Your compiler might not actually produce assembly language code and instead go directly to machine code. But you can still see assembly language code if you're curious. And there might be rare cases when you are trying to improve code efficiency and write assembly language directly in order to improve performance.
+
+In the previous demonstration, you can use the following commands to output the assembly language code:
+
+```bash
+cd ~/home/workspace/demo_machine_code
+g++ -S machine_code.cpp
+```
+
+This will output a file called machine_code.s, which you can then double-click to see its contents.
+
+Assembly language is not nearly as intuitive as C++, but it is still human readable. When you do something as simple as declaring and defining a variable,`int x = 5;`. the computer has to break this up into a series of steps like assigning a space in memory to the variable x and then placing the value 5 into the assigned space.
+
+You can write out each of these steps directly in assembly language. For the purposes of this course, you do not need to be familiar with assembly language. But just looking at assembly code will prove to you that every line of C++ code has consequences in terms of efficiency. Look at the number of steps involved with just assigning the value to x.
+
+Unnecessary lines of code mean that the CPU will take more time to execute a program than what is actually needed.
+
+# Binary
+
+Watch [this video](https://youtu.be/K6CpHxnhc2s).
+
+## How much space do my variables use?
+
+The  [standard that defines C++](https://isocpp.org/std/the-standard)  specifies the minimum number of bytes required for each variable type. For instance, an integer is guaranteed to have at least 2 bytes or 16 bits.
+
+That does not mean your computer will use 16 bit integers by default. The default number of bits will depend on how your computer system was designed. An int variable might be 16 bits on some systems but 32 bits on other systems. You can get more information at this  [link](http://en.cppreference.com/w/cpp/language/types).
+
+Although the exercises later in this lesson will focus on increasing the speed of your code, you might find yourself at other times trying to optimize for memory use as well. The more comfortable you are with how your computer works, the more tools you will have for optimization.
+
+## All Variables are Binary
+
+C++ stores all variables in multiples of bytes:
+
+-   a char is 1 byte
+-   a 16-bit integer would be 2 bytes
+-   a 32-bit integer would be 4 bytes
+-   a 32-bit float would be 4 bytes
+
+Thus all variables are represented by binary number. A 32-bit integer and a 32-bit float number take up the same amount of space; they would both be represented by a series of thirty-two 0s and 1s.
+
+## How Bytes Limit Value Ranges
+
+In C++, your variables will take up either 8, 16, 32, or 64 bits of memory, which are 1, 2, 4, and 8 bytes respectively.
+
+The number of bytes put a limit on the minimum and maximum values that your variables can hold. As mentioned in the video, a 32 bit integer can have a maximum value of 4,294,967,295; however, if a variable might take on either a positive or negative value, then you need to use one bit to represent the variable's sign. This leaves 31 bits to represent the integer giving a max value of 2,147,483,647.
+
+Likewise, 32-bit floats can only contain about seven decimal places whereas 64-bit doubles can have about 15. The explanation for how floats are stored is a bit complex; however, you can imagine that a fixed number of bits puts a limit on the amount of decimal places that can be kept. In fact, you'll see this in an upcoming demo.
+
+## Is my system 32 bit or 64 bit?
+
+Your CPU probably either has a 32-bit architecture or a 64-bit architecture. That means the CPU was designed to work well with storing and manipulating information in 32-bit chunks versus 64 bit chunks.
+
+If your CPU uses a 32-bit architecture, you can still create 64-bit variables in your programs as long as your compiler has this feature. But, the code will most likely run more slowly than using a 64-bit architecture with 64-bit variables. On a 32 bit system, the compiler has to create extra instructions to move and do math on 64-bit variables.
+
+If you'd like to see whether your computer has a 32-bit or 64-bit system, here are instructions for:
+
+-   [windows](https://support.microsoft.com/en-us/help/827218/how-to-determine-whether-a-computer-is-running-a-32-bit-version-or-64)
+-   [mac](https://apple.stackexchange.com/questions/12666/how-to-check-whether-my-intel-based-mac-is-32-bit-or-64-bit)
+
+
+# Memory and the CPU
+
+Watch [this video](https://youtu.be/60jEbKV1UOI).
+
+## Stack vs Heap
+
+##### Stack
+
+When you declare a variable in C++, the variable will automatically be placed on the stack. Once a function terminates, for example the main function, then the variable is removed from the stack; however, in terms of the code you've written so far in the nanodegree, there is one exception. The elements in a vector actually get placed on the heap, but the compiler still manages the allocation and deallocation of memory for you.
+
+The stack removes variables by the "last in first out" rule; in other words, the last variable to be placed on the stack will be the first variable removed from the stack. This makes sense given that when a function is called, variables will be allocated to memory and then when the function terminates, variables will be removed from memory.
+
+The stack also tends to be relatively small: perhaps 1 MB depending on your system. One advantage to keeping the stack small is for multi-threading. Let's say you only have 50 MB of RAM for the stack. Your CPU could do about 50 simultaneous tasks because of the smaller stack size. But because the stack is small, the stack can run out of memory; this is called stack overflow.
+
+#### Heap
+
+The heap, on the other hand, is only limited by the amount of RAM currently available. So variables that hold a lot of memory have to go on the heap. But when you declare a variable on the heap, you are responsible for removing the variable from memory. If you don't, then it becomes more likely that your program will run out of memory before the program terminates. And then your program will crash.
+
+The heap also tends to be slower; a compiler organizes the stack for you and knows where the next available memory slot is; on the other hand, a program might have to search for an empty spot to put a variable on the heap.
+
+In relation to code efficiency, only use the heap when necessary. Although you will not need to use the heap in the nanodegree, you'll at least become familiar with the syntax so that you can recognize when a program is using the heap. In the next section, you'll also see a demonstration about the stack versus the heap.
+
+## Variables and Memory
+
+Variables make programming much easier. Imagine what programming would be like if variables did not exist; you would have to determine
+
+-   determine how many bytes your variable needs
+-   find an available address to store the value
+-   make sure there are enough consecutive bytes available for storage
+-   you would also have to remember what value was stored at each hexadecimal address so that you could retrieve the right value as needed.
+
+But with variables, the compiler does all of the memory management for you. And you can use descriptive names to help you remember what is contained in each variable.
+
+This is essentially what the compiler is doing for you in terms of variables and memory management; without you having to think about it, the compiler efficiently finds space for your variables and keeps track of their location.
+
+## Dynamic Memory
+
+To understand the next demo, you need to know about dynamic memory allocation and pointers.
+
+Dynamic memory allocation refers to when you, the programmer, assign variables to memory manually. These variables will go on the heap rather than the stack.
+
+The opposite of dynamic memory allocation would be static memory allocation. You've already been using static memory in your programs; when you declare variables in your programs, the compiler knows ahead of time how much memory each variable will need; the amount of memory your variables need does not change as the program executes, so this memory is "static". The stack is used for static memory allocation.
+
+The compiler doesn't know how much memory will be needed for dynamically allocated variables; hence, dynamic memory gets allocated when you execute your programs. Dynamically allocated variables go on the heap.
+
+To use dynamic memory, you need to be familiar with  **pointers**  and the  **new**  and  **delete**  C++ syntax. A pointer is a special type of variable that holds a memory address rather than a value. You don't need to know how to use pointers, but they show up in the demo in the next part of the lesson.
+
+Here is an example of dynamic memory allocation using pointers:
+
+```cpp
+#include <iostream>
+
+int main() {
+
+    // asterisk syntax creates a pointer variable, which can hold a memory address
+    int * pointervariable;
+
+    // new is used to create a variable on the heap. This line
+    // assigns an addresss to pointervariable and reserves enough space
+    // told hold an integer.
+    pointervariable = new int;
+
+    // Pointer variable holds an addresss. The address allows placing a value in
+    // memory at the address.
+    *pointervariable = 10;
+
+    std::cout << "pointer value:  " << *pointervariable << "\n";
+    std::cout << "pointer address: " << pointervariable << "\n";
+
+    // remove pointervariable from the heap
+    delete pointervariable;
+    pointervariable = NULL;
+
+    return 0;
+}
+```
+
+With the result outputting something like:
+
+```bash
+pointer value: 10
+pointer address: 0x1004053c0
+```
+
+although the exact memory address will differ from machine to machine. The pointer address is a  [hexadecimal number](https://en.wikipedia.org/wiki/Hexadecimal)  representing the location in memory.
+
+The new operator assigns memory to the heap. You are are responsible for removing the variable when you are done with it, which is what the delete operator is for. Setting the pointer to NULL is good practice.
+
+If you do not remove the variable, your program could run out of memory during execution; some operating systems might delete memory from the heap when your program terminates but some might not. Forgetting to remove dynamically allocated variables is called a  **memory leak**.
+
+Newer versions of C++ also include  [smart pointers](https://msdn.microsoft.com/en-us/library/hh279674.aspx)  that delete automatically when the program terminates.
+
+Next, you'll see a demonstration of static versus dynamic memory allocation.
+
+# C++ Optimization Techniques
+
+Now comes the practical part of C++ optimization. You are going to learn a handful of code optimization strategies and then apply those strategies to increase the speed of a C++ program.
+
+However, remember that optimizing a program involves other facets besides the programming language itself. Your program's speed will also depend on your hardware, your compiler and what computer algorithms you choose. The more familiar you become with all of these different facets, the more tools you will have for optimization. Here is a brief summary of why each of these aspects is so important.
+
+## Hardware
+
+Some hardware might have limitations that slow down your code. For instance, when calculating trigonometric functions, a processor might use a slow software approximation. If instead, you could use  [small-angle approximation](https://en.wikipedia.org/wiki/Small-angle_approximation), you might get your code to run faster.
+
+Embedded hardware might not have much memory or have a 16-bit or 32-bit architecture instead of a 64-bit architecture. Using 64-bit integers on a 16-bit architecture might be possible with your compiler, but it would also probably be inefficient.
+
+## Compilers
+
+Many compilers will optimize at least parts of your code for you. For instance, it might be more efficient for the CPU to unroll a for loop to avoid checking the conditional statements:
+
+```
+
+// for loop
+for (int i = 0; i < 5; i++) {
+     std::cout << i << "\n";
+}
+
+// for loop unrolled
+std::cout << 0 << "\n";
+std::cout << 1 << "\n";
+std::cout << 2 << "\n";
+std::cout << 3 << "\n";
+std::cout << 4 << "\n";
+
+```
+
+The unrolled version could run faster because unrolling avoids checking if  `i < 5`  is true. For a more complete list of what your compiler might try to do, read this article  [here](https://en.wikipedia.org/wiki/Optimizing_compiler).
+
+## Algorithms
+
+Some algorithms are known to be faster than other algorithms. A common case would be sorting algorithms;  [quicksort](https://en.wikipedia.org/wiki/Quicksort), for example, is known to be faster than  [bubble sort](https://en.wikipedia.org/wiki/Bubble_sort).
+
+Here is another important point to keep in mind; C++ libraries are very convenient, but that doesn't mean they use the fastest algorithms especially for your individual case. Being aware of what is happening under the hood provides more opportunities for improving efficiency.
+
+## C++
+
+And now, let's move on to optimizing C++. You are going to learn a handful of techniques and practice implementing them. Then at the end of the lesson, you'll have the opportunity to optimize a C++ histogram filter.
+
+Here is a preview of the type of things you will be learning: Did you know that every time you call a function, C++ copies the input variables into memory? Take this example:
+
+```cpp
+#include <iostream>
+
+int addition(int a, int b);
+
+int main() {
+
+    int x, y;
+    x = 5;
+    y = 7;
+
+    std::cout << addition(x, y) << "\n";
+
+}
+
+int addition(int a, int b) {
+    return a + b;
+}
+```
+
+C++ puts the x variable into memory and the y variable into memory as expected.
+
+When you call the addition function, C++ actually then puts the a variable and the b variable into memory as well; essentially C++ is copying x and y into memory twice even though the x and y values could have been used directly.
+
+For a 32-bit integer, this might not be an issue; however, once you start working with larger variables such as 2-D vectors, the extra read and writes can slow your programs down.
+
+In this lesson, you'll learn how to speed up your code in situations like these.
+
+## Software Development
+
+Writing functioning code is arguably your number one goal as a software developer. Depending on your application, code efficiency might be very important as well.
+
+You could break down the code development process into the following steps:
+
+-   code design
+-   implementing the design
+-   testing for bugs and fixing the bugs
+-   optimization
+
+For a more detailed explanation of each of these steps (design, implementation, testing), see this  [link](https://en.wikibooks.org/wiki/Optimizing_C%2B%2B/Optimization_life_cycle).
+
+As mentioned previously, there are many facets to code optimization related to hardware, compilers, algorithms and the C++ language itself. In this lesson, you'll focus on the C++ language. What you've just learned about the CPU and RAM will provide the context for why your code is able to run faster.
+
+You will have the opportunity to learn and implement a few techniques that make C++ run even faster. Each exercise presents a "slow" version of the code and a technique for making the code faster. You will then implement the technique to see how much faster the code runs. While these techniques do not encompass all of the ways to optimize C++ code, you'll gain an understanding of how memory, the CPU and coding choices affect how fast your code runs.
+
+At the end of the lesson, you are going to receive a set of files for a functioning C++ histogram filter. Your job will be to make the histogram filter code run faster using the techniques you've learned in the lesson.
+
+## How to Optimize: Testing versus Instinct
+
+To optimize your code, rely on testing and verification rather than instinct!
+
+Test your code to find areas that are inefficient in terms of time, memory or power use. Then, verify that any changes you have made really do make the code more efficient. If you test first, you might even find that your code is already efficient enough for your particular application.
+
+If you were optimizing a large amount of code, you would want to use something called a profiler. A profiler is a piece of software that measures how long parts of your code are taking to execute or how many resources the code uses. The profiler helps you find congestion points so that you can optimize the least efficient parts of the code first.
+
+Both Visual Studio and Xcode come with profilers, which you can read about at these links:
+
+-   [Profiling in Visual Studio](https://docs.microsoft.com/en-us/visualstudio/profiling/beginners-guide-to-performance-profiling)
+-   [Profiling in Xcode](https://developer.apple.com/library/content/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/index.html)
+
+### Testing your Code with Standard Clock
+
+In the following exercises, we've set up some simple profiling code for you; you'll time how long it takes to run a function using the C++ standard clock.
+
+You will optimize by:
+
+-   seeing how long it takes to run a function
+-   change some aspect of the code
+-   run the code again to see if the code runs faster
+
+The profiling code has already been set up for you, and it looks like this:
+
+```cpp
+#include <ctime>
+
+std::clock_t start;
+double duration;
+
+start = std::clock();
+
+function_name(var1, var2);
+
+duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+
+std::cout << "duration milliseconds initialize beliefs " << 1000 * duration << '\n';
+```
+
+The code stores the current standard clock time, then runs a function, and then calculates the elapsed time.
+
+The standard library clock measures time in terms of  **clock ticks**. Clock ticks are like a counter variable that goes up at a constant rate of time. But the length of time varies from system to system; therefore, dividing by the constant CLOCKS_PER_SEC gives the results in terms of seconds. The CLOCKS_PER_SEC variable is defined in the ctime library.
+
+# Overview of Techniques in this Lesson
+
+Here is an overview of the techniques you will be learning and using to optimize C++ code. Refer back to this page as you work through the exercises and on the final project. Each of these techniques will be expanded further throughout the lesson.
+
+If you are wondering why we chose these techniques, it's because you can use all of them to optimize Andy's histogram filter code. This is not a comprehensive list of optimization techniques by any means; rather, practicing these techniques will get you thinking about your code from a new perspective. While your focus up until now has been on code implementation, now you will appreciate the consequences of your coding decisions.
+
+## Remove Dead Code
+
+When you write your code, you might end up with a chunk of code that is no longer used but still part of the program. Watch out for cases like these: remember that every line of code involves some work by the CPU and oftentimes a read or write to memory. Any unnecessary code could slow things down.
+
+## Avoid Extra if Statements
+
+Code with multiple branching if statements is oftentimes inefficient:
+
+```cpp
+int x = 5;
+if (x >= 5) {x = x + 1;}
+if (x < 5) {x = x - 1;}
+```
+
+You could transform the above code into if else statements, which avoids the CPU checking whether x is less than 5.
+
+## Avoid Nested for Loops
+
+A section of code like this:
+
+```cpp
+for (int i = 0; i < 5; i++) {
+   for (int j = 0; j < 4; j++) {
+         matrix[i][j];   
+   } 
+}
+```
+
+should look somewhat familiar. This is how you have been iterating over the values in a matrix. Sometimes you have no choice but to use a nested for loop; however, depending on the application, you might not need a nested for loop if you think about the problem in a different way. And instead of needing twenty iterations like in the above code, you might only need 9 or fewer iterations.
+
+## Avoid Creating Extra Variables
+
+You'll see that Andy sometimes creates extra variables that aren't needed. For example,
+
+```cpp
+float x = 2;
+float y = 7;
+float z = 4;
+
+float volume = x * y * z;
+
+float volume_reciprocal = 1 / volume;
+```
+
+The volume variable isn't really necessary. You could calculate the reciprocal directly:
+
+```cpp
+volume_reciprocal = 1 / (x * y * z);
+```
+
+You might not get much of a performance boost; float variables are relatively efficient in C++. But imagine creating a new variable to hold a larger variable like a 2D vector. All of the extra memory writes will definitely slow things down.
+
+## Reserve Space in Memory for Vectors
+
+You've been using 2D vectors to represent matrices. C++ vectors have a big benefit in terms of convenience; you can add new elements to the vector as needed. Arrays, on the other hand, have a fixed length that cannot be changed after declaring them.
+
+But this flexibility comes at a cost; C++ vectors are very inefficient in terms of execution time. In fact, programs that require speedy execution would generally not use C++ vectors and especially not big for loops to iterate through vectors; instead, programs are written to take advantage of  [parallel processing](https://en.wikipedia.org/wiki/Parallel_computing)  on either the CPU or a GPU (graphics processing unit).
+
+When you declare and define a vector, the compiler reserves space in memory plus some extra bytes in case the vector expands. Once the vector's length expands past the reserved memory, the entire vector will get copied over to a different place in RAM with enough available space.
+
+That is very inefficient! In Andy's histogram filter code, you already know how large your vectors need to be because the robot world has a fixed number of grid spaces. If you reserve space for the vector, then you can avoid all of the extra memory reallocations as you expand the vector's length. The syntax is as simple as coding:
+
+```cpp
+std::vector<int> foo;
+foo.reserve(15);
+```
+
+Now the foo vector is guaranteed to have enough space for holding fifteen integers.
+
+## Passing Variables by Reference
+
+Whenever you call a function, C++ copies any input variables into memory even if those variables are already in memory. For fundamental data types like int, char, or float, this might not be a problem.
+
+But with variables that take up a more significant amount of space, such as vectors, the extra copying can slow down your programs.
+
+You'll learn how to pass variables by reference instead of by value. Passing by reference tells your function to use the variable directly in memory rather than copying the entire variable to memory over again.
+
+## Using Static
+
+In Andy's code, you'll see that he calculates certain vectors and values inside a function, but these values are always the same every time the function is called.
+
+Instead of calculating the variables over and over again, you can declare these variables as static. When the function is called the first time, C++ stores the values in memory and re-uses the values every time the function is called.
+
+## Next Part of the Lecture
+
+The next part of the lessons has a series of exercises that will get you ready for the project. In each exercise, you will receive code that has one of the issues discussed on this page. And then you will change the code to get the program to run faster.
+
+You'll see that every time you run the code, the timer gives slightly different results; when you run your C++ program, the CPU might be carrying out other tasks that could affect timing. Be sure to execute your code multiple times to convince yourself that your code is (or isn't) running faster.
+
+# What is Dead Code?
+
+Dead code is extra code in your program that no longer serves a purpose. Maybe while implementing a solution, you started down a path that did not end up working out. Or you put in extra code for debugging purposes, but this code is not actually part of the solution. The dead code just sits in your program without affecting the implementation.
+
+Dead code can slow down a program; the code will still be executed on the CPU and might include reads and writes to memory although the code is never used.
+
+Two other issues related to dead code, and sometimes also considered to be dead code, are  **redundant code**  and  **unreachable code**.
+
+### Redundant Code
+
+Redundant code is just like it sounds; this is code that gets repeated multiple times although isn't necessary. Here's a quick example:
+
+```cpp
+// example of redundant code
+int x = 6;
+if (x > 5) {
+   return true;
+}
+else {
+   return false;
+}
+```
+
+Essentially, saying x > 5 and then returning True is redundant. You could eliminate the if statement by just saying
+
+```cpp
+return x > 5;
+```
+
+Here's another example
+
+```cpp
+    if (x < 5) {
+           x = x + 1;
+    }
+    else if (x >= 5 && x < 10) {
+        x = x + 2;
+    }
+```
+
+There is no need to check if  `x >= 5`; the first if statement has essentially already proven whether x is greater than or less than five.
+
+Finding redundant code, however, might not be so easy. It could be an extra variable declaration or maybe some extra logical statements like in the above example.
+
+## Unreachable Code
+
+Unreachable code never gets executed. Unreachable code might not have too much of an effect on code speed, but the code still takes up space in memory and can make memory management less efficient.
+
+A simple example would be the following:
+
+```cpp
+unsigned int x;
+
+... 
+
+if (x >= 0) {
+   do_something ..
+}
+else {
+  do_something ..
+}
+```
+
+An unsigned integer is always zero or positive, so the else statement will never execute. The code inside the else statement is unreachable.
+
+When you get to Andy's code at the end of the lesson, just keep an eye out for dead code or redundant code. You might find a couple of spots.
+
+In the next part of the lesson, you will see a program that adds two matrices together. You'll execute the code to see how fast it runs. But the program contains dead code. So you will remove the dead code to see if the program runs faster.
+
+# If Statements
+
+Many compilers will try to optimize if statements for you. So writing something like this:
+
+```cpp
+int x = 7;
+
+if (x > 0) {
+  return y;
+if (x <= 0) {
+   return z;
+}
+```
+
+might become
+
+```cpp
+int x = 7;
+if (x > 0) {
+   return y;
+else {
+   return z;
+}
+```
+
+The compiler won't literally rewrite your C++ code into optimized C++ code; the compiler does the optimization when outputting assembly language or machine code. But in general, you'll want to avoid too many if branches because each branch's logical expression requires time on the CPU.
+
+Thinking about how if statements are executed, it's also more efficient to put the most common cases on a higher branch.
+
+Here is a simple example:
+
+```cpp
+    for (int i = 0; i < 1000; i++) {
+        if (i > 0 && i < 5) {
+            cout <<  "low \n";
+        }
+        else if (i >= 990) {
+            cout << "high \n";
+        }
+        else {
+            cout << "normal \n";
+        }
+    }
+```
+
+Most of the time, the above code will print out the word "normal". So the code needs to go through all of the if and else branches most of the time as the CPU compares  **i**  in each branch.
+
+It would be more efficient to put the "normal" case at the top of the branches instead of at the bottom:
+
+```cpp
+for (int i = 0; i < 1000; i++) {
+    if (i >= 5 && i < 990) {
+        cout <<  "normal \n";
+    }
+    else if (i >= 990) {
+        cout << "high \n";
+    }
+    else {
+        cout << "low \n";
+    }
+}
+```
+
+Now, most of the time, the CPU can skip the else if and else branches.
+
+# If Statements on the CPU
+
+There's one other aspect of if statements that you don't have much control over when using a high level language like C++. The CPU also tries to optimize if statement calculations by running simultaneous calculations.
+
+When running a calculation, the CPU can look ahead and start working on another calculation in parallel. In terms of if statements, the CPU will try to predict which branch will be taken next and starts running the calculations inside the predicted branch. When it's time to evaluate the logical expression, the CPU might realize that it made a bad prediction. If the prediction is wrong, the predicted calculation stops and the CPU starts running the correct calculation.
+
+So be aware that you might not get too much of a time boost when rearranging or eliminating if statements. Both the compiler and the CPU are already trying to optimize these operations for you.
+
+# For Loops
+
+There is nothing wrong with using nested for loops (ie for loops inside of for loops). Sometimes you need them when working with C++ vectors.
+
+However, don't use them if you don't need them! There are a few places in Andy's code where he has used nested for loops that were not needed.
+
+If you are iterating through or initializing an m by n matrix, you might be tempted to always use nested for loops like this:
+
+```cpp
+    for (unsigned int i = 0; i < matrix.size(); i++) {
+        for (unsigned int j = 0; j < matrix[0].size(); j++) {
+            do something...
+        }
+    }
+```
+
+Iterating through the entire matrix involves m times n operations. However, depending on what you are trying to do, you might be able to get away with doing something like this:
+
+```cpp
+    for (unsigned int i = 0; i < matrix.size(); i++) {
+        do something
+    }
+
+    for (unsigned int j = 0; j < matrix[0].size(); j++) {
+        do something
+    }
+```
+
+This only requires m + n operations instead of m * n operations. Remember that fewer instructions for the CPU will get your code to execute faster!
+
+# Intermediate Variables
+
+In Andy's code, you'll notice that he sometimes uses intermediate variables. Intermediate variables could be considered redundant code.
+
+For example:
+
+```cpp
+float x = 5.8;
+float y = 7.1;
+
+float area = x * y;
+float reciprocal_area = 1/(area);
+```
+
+If you only needed to calculate the reciprocal, you could have written:
+
+```cpp
+float x = 5.8;
+float y = 7.1;
+float reciprocal_area = 1/(x*y);
+```
+
+Fundamental variable types like float, int, and char are relatively efficient. So you probably won't notice much of a different when running these two versions of the code. In fact, your compiler might end up eliminating any inefficiencies between the first version and the second version.
+
+So why discuss intermediate variables?
+
+# Intermediate Matrix Variables
+
+You'll find a spot in Andy's code where he actually uses a 2D vector as an intermediate variable. It's not as obvious as the above example. But if you find it, you can definitely make the code run faster by eliminating the extra variable.
+
+As mentioned in the beginning of the lesson, vectors are convenient but not particularly efficient; the compiler allocates a certain amount of memory for a new vector and adds a few more bytes as a buffer. The buffer can hold extra elements that you might push to the back of the vector.
+
+But when the vector increases beyond its allocated size, the whole entire vector gets copied to another part of RAM. That is super inefficient!
+
+So if you already have a variable vector that you can update directly, avoid making a copy of the vector!
+
+# Vector Memory Storage
+
+As previously mentioned, vectors are not the most efficient variable type in C++. One reason is because you do not need to specify a vector's length when declaring a vector variable. So the compiler will not know ahead of time how much memory to allocate. And once the vector's length goes beyond the initial allocated memory, the entire vector gets copied to a part of RAM with more space.
+
+A vector is more efficient if you specify the vector's length before pushing values. You can do this with the reserve() method, which will guarantee that the vector can hold the number of elements reserved.
+
+# Example
+
+Here is an example of how to use the reserve() method.
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    vector<int> myvector;
+    int vector_size = 50;
+    myvector.reserve(vector_size);
+
+    for (int i = 0; i < vector_size; i++) {
+        myvector.push_back(i);
+    }
+
+    return 0;
+}
+```
+
+In C++, there are multiple ways to initialize a 2D vector. When optimizing your programs, you'll need to test out different ways to initialize to see which works best in your specific program.
+
+The fastest way could end up depending on the vector length and vector types.
+
+# References
+
+Did you know that every time you call a function, those input variables get copied into memory? You can prove this to yourself with the following code:
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// function declaration that prints out a matrix's address in memory
+void matrix_address(vector< vector<int> > my_matrix);
+
+int main() {
+
+    // initialize a matrix
+    vector< vector<int> > matrix(5, vector<int>(6,2));
+
+    // print out the matrix address
+    cout << "original variable address: " << &matrix << "\n";
+
+    // run a function that prints out a matrix address
+    matrix_address(matrix);
+
+
+    return 0;
+}
+
+// function to print out a matrix address
+void matrix_address(vector< vector<int> > my_matrix) {
+
+    cout << "function variable address: " << &my_matrix << "\n";
+
+}
+```
+
+When you run this code, you'll get output that looks something like this:
+
+**original variable address: 0x7fff5fbff650**
+
+**function variable address: 0x7fff5fbff608**
+
+So what is this code doing? The code initializes a 5x6 2D vector in a variable called matrix. Then the code prints out the address in memory where the 2D vector starts.
+
+Next, the code calls a function that prints out the address in memory of the function's input variable. Notice that the addresses are not the same even though the two variables hold the same value.
+
+This is because C++ is copying the 2D vector into memory again when you call the matrix_address() function.
+
+# Ampersand Symbol
+
+In the above code, you might have noticed the ampersand symbol: &.
+
+This symbol gives you the address of a variable rather than the value of a variable. Do you remember in the previous lesson when you briefly learned about pointers? The ampersand is an easy way to access a variable's address without the danger of you mistakenly messing something up in memory.
+
+And you can use the ampersand to help speed up your code!
+
+# How the Ampersand Can Speed Up Code
+
+C++ has a few fundamental data types like int, char, and float that are relatively fast to work with. So the coding strategy you're about to learn might not make much of a different with fundamental data types; however, with variables that take up a lot of memory such as arrays or vectors, the ampersand can be quite useful.
+
+What if the matrix_address function shown above had been defined like this?
+
+```cpp
+void matrix_address(vector< vector<int> >&my_matrix);
+```
+
+The ampersand (&) tells the compiler to pass the input variable by reference. That means inside your function, you'll be working with the original variable instead of a copy. In the case of a 2D vector, you've just saved yourself a lot of reads and writes.
+
+And, depending on your application, you might be able to modify the input vector directly instead of creating a new vector inside your function. For example, if you were going to code scalar multiplication on a vector, and you didn't need to keep the original vector, you could modify the original vector directly. You'll see what this means in the exercise.
+
+# The Static Keyword
+
+Sometimes you'll need to use the same variable over and over again in your functions. If you think back on Andy's Python histogram filter code, the blur() function was an example.
+
+The blur function contains a handful of blurring factors that are always the same every time the function gets called; however, in Andy's C++ code, which you'll be working with soon, he recalculates these blurring factors every time the code gets run.
+
+What if you could declare and define these variables once no matter how many times your function gets called? You'd be able to eliminate some reads and writes to memory. This is the perfect use case for the C++ static keyword.
+
+# Example
+
+When you declare and define a variable inside a C++ function, the value gets allocated to memory.
+
+For example,
+
+```cpp
+some_function() {
+   int x = 5;
+}
+```
+
+allocates space in memory for the variable x and then assigns the value five. Then, when the function finishes, the CPU will remove the x variable from RAM. That means every time you run the function, the CPU will allocate and deallocate memory for the x variable.
+
+If, on the other hand, your code uses the static keyword, the x variable gets allocated to memory the first time the function runs. And the x variable just stays allocated in memory for the duration of the entire program. You've just saved yourself some reads and writes to RAM:
+
+```cpp
+some_function() {
+    static int x = 5;
+}
+```
+
+Notice that you need to declare and define the variable simultaneously. You cannot define a variable with the static keyword without giving the variable a value.
+
+# Global Variables versus Static Variables
+
+Static variables are actually placed in the same area of RAM as global variables. The difference is that global variables are declared outside of functions and are available anywhere in your program to any file or function. On the other hand, static variables remain in scope. So in the above example, some_function() is the only place that can access the x variable.
+
