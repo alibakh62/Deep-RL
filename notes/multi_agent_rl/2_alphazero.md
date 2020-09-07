@@ -92,3 +92,24 @@ We could choose the action with the highest `U` or `V`, but sometimes they might
 See the video [here](https://youtu.be/wn2B3j_Qz6E).
 
 # Monte Carlo Tree Search 2 - Expansion and Backpropagation
+Starting with state, we learned previously how to search systematically through one layer of a game tree using the variables `U`, `N`, and `V`. **Can we generalize this to go deeper into the tree so that we can better anticipate a long sequence of moves?**
+
+This is possible through what's called **expansion and backpropagation.** Let's see how it works in action.
+
+See [the video](https://youtu.be/H34Wtk1iNDY) for explanation.
+
+# AlphaZero 1: Guided Tree Search
+Watch the video [here](https://youtu.be/LinuRy47xbw).
+
+# Alpha Zero 2: Self-Play Training
+Watch the video [here](https://youtu.be/wl1qfPXqRuQ).
+
+# TicTacToe using AlphaZero - notebook walkthrough
+Watch the following videos:
+
+- [video1](https://youtu.be/uUFuBscf98I)
+- [video2](https://youtu.be/hKnBQvtJ_zQ)
+
+# Advanced TicTacToe with AlphaZero - Walkthrough
+Watch the video [here](https://youtu.be/MOIk_BbCjRw).
+
